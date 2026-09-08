@@ -1,10 +1,5 @@
 <?php
 
-Route::get('/', function () {
-    return view('welcome'); // Aquí iría la vista "demostración" del sistema
-});
-
-
 
 
 use Illuminate\Support\Facades\Route;
