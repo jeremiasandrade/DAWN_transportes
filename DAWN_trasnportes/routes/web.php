@@ -23,6 +23,8 @@ Route::resource('pagos', PagoController::class);
 // Ruta para el Dashboard / Página de inicio del usuario
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
+Route::get('/', function () {
+    return view('welcome'); // 'welcome' sería el nombre de tu archivo blade (welcome.blade.php)
+});
 
-Route::get('/usuarios', [UserController::class,'index'])->name('usuarios.index');
 

@@ -1,0 +1,43 @@
+services:
+  dawn_transportes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dawn_transportes_app
+    restart: always
+    ports:
+      - "8000:80"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=mariadb_database
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-dawn_transportes}
+      - DB_USERNAME=${DB_USERNAME:-Jeremias}
+      - DB_PASSWORD=${DB_PASSWORD:-197328}
+    depends_on:
+      - mariadb_database
+    networks:
+      - dawn_network
+
+  mariadb_database:
+    image: mariadb:10.11
+    container_name: dawn_transportes_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-dawn_transportes}
+      MYSQL_USER: ${DB_USERNAME:-Jeremias}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-197328}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-197328}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - dawn_network
+
+volumes:
+  mariadb_data:
+
+networks:
+  dawn_network:
+    driver: bridge
