@@ -20,7 +20,7 @@ services:
       - dawn_network
 
   mariadb_database:
-    image: mariadb:10.11
+    image: docker.io/library/mariadb:10.11
     container_name: dawn_transportes_db
     restart: always
     environment:
@@ -29,7 +29,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-197328}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-197328}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
