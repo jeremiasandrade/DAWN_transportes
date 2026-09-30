@@ -12,7 +12,6 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\DashboardController;
 
 
-Route::resource('reservas', ReservaController::class);
 Route::resource('usuarios', UserController::class);
 Route::resource('vehiculos', VehiculoController::class);
 Route::resource('destinos', DestinoController::class);
@@ -27,4 +26,9 @@ Route::get('/', function () {
     return view('welcome'); // 'welcome' sería el nombre de tu archivo blade (welcome.blade.php)
 });
 
+//ruta general del sistema llamada "desarrollo", usada para ver todas las vistas del sistema desde un solo lugar
+
+Route::get('/desarrollo', function () {
+    return view('desarrollo'); // 'desarrollo' accede mediante botones a todas las vistas del sistema
+});
 
