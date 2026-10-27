@@ -9,6 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    # Define la subcarpeta por defecto para todos los comandos 'run'
+    defaults:
+      run:
+        working-directory: DAWN_trasnportes
 
     services:
       mysql:
@@ -36,10 +41,13 @@ jobs:
         mysql -h 127.0.0.1 -u root -p150906 -e "CREATE USER IF NOT EXISTS 'Jeremias'@'%' IDENTIFIED BY '150906'; GRANT ALL PRIVILEGES ON Dawn_Transportes.* TO 'Jeremias'@'%'; FLUSH PRIVILEGES;"
 
     - name: Copy Environment File
-      run: cp DAWN_trasnportes/.env.example .env
+      run: cp .env.example .env
 
     - name: Install Composer Dependencies
       uses: ramsey/composer-install@v3
+      with:
+        # Especifica explícitamente la carpeta para la acción de Composer
+        working-directory: DAWN_trasnportes
 
     - name: Generate Application Key
       run: php artisan key:generate
