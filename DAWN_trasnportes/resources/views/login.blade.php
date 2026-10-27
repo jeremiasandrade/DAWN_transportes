@@ -18,7 +18,7 @@
         <div class="w-full max-w-md p-8 md:p-12 rounded-3xl bg-sky-100/80 shadow-lg border border-sky-200/50 mx-4">
             <h2 class="text-3xl font-bold text-center text-slate-800 mb-8 tracking-tight">
                 Bienvenido
-            </h2>
+            </h2>clear
             
             <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-6">
                 @csrf

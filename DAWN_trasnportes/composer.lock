@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7c5dc46e4534b15d9950044fe324c3a7",
+    "content-hash": "4fce3d09c9aa4c453778a553ab5dc1ed",
     "packages": [
         {
             "name": "brick/math",
@@ -6632,16 +6632,16 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v2.9.0",
+            "version": "v2.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "ebe59d97cbc66b66f735e6ec7ff859233e7934e0"
+                "reference": "75c269a8a53e931c7252e7cd562e1a209356a7c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/ebe59d97cbc66b66f735e6ec7ff859233e7934e0",
-                "reference": "ebe59d97cbc66b66f735e6ec7ff859233e7934e0",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/75c269a8a53e931c7252e7cd562e1a209356a7c6",
+                "reference": "75c269a8a53e931c7252e7cd562e1a209356a7c6",
                 "shasum": ""
             },
             "require": {
@@ -6656,6 +6656,7 @@
                 "php": "^8.2"
             },
             "require-dev": {
+                "jasonmccreary/double": "^1.0",
                 "laravel/pint": "^1.27.0",
                 "mockery/mockery": "^1.6.12",
                 "orchestra/testbench": "^9.15.0|^10.6|^11.0",
@@ -6694,7 +6695,7 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2026-09-14T14:40:10+00:00"
+            "time": "2026-10-07T19:07:19+00:00"
         },
         {
             "name": "laravel/mcp",
