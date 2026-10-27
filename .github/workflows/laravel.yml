@@ -10,7 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    # Define la subcarpeta por defecto para todos los comandos 'run'
     defaults:
       run:
         working-directory: DAWN_trasnportes
@@ -32,7 +31,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.4'
         extensions: mbstring, dom, fileinfo, mysql, pdo
         coverage: none
 
@@ -46,7 +45,6 @@ jobs:
     - name: Install Composer Dependencies
       uses: ramsey/composer-install@v3
       with:
-        # Especifica explícitamente la carpeta para la acción de Composer
         working-directory: DAWN_trasnportes
 
     - name: Generate Application Key
