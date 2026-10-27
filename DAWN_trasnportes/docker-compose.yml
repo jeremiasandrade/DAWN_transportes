@@ -5,8 +5,6 @@ services:
       dockerfile: Dockerfile
     container_name: dawn_transportes_app
     restart: always
-    ports:
-      - "8000:80"
     environment:
       - DB_CONNECTION=mysql
       - DB_HOST=mariadb_database
@@ -14,8 +12,27 @@ services:
       - DB_DATABASE=${DB_DATABASE:-dawn_transportes}
       - DB_USERNAME=${DB_USERNAME:-Jeremias}
       - DB_PASSWORD=${DB_PASSWORD:-197328}
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=mailpit
+      - MAIL_PORT=1025
+      - MAIL_ENCRYPTION=null
     depends_on:
       - mariadb_database
+      - mailpit
+    networks:
+      - dawn_network
+
+  nginx_web:
+    image: nginx:alpine
+    container_name: dawn_transportes_nginx
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - dawn_transportes
     networks:
       - dawn_network
 
@@ -32,6 +49,16 @@ services:
       - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
+    networks:
+      - dawn_network
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: dawn_transportes_mailpit
+    restart: always
+    ports:
+      - "1025:1025" # Puerto SMTP
+      - "8025:8025" # Interfaz Web para ver correos
     networks:
       - dawn_network
 
