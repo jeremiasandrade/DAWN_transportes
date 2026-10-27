@@ -1,0 +1,62 @@
+name: Laravel CI
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: DAWN_trasnportes
+
+    services:
+      mysql:
+        image: mariadb:10.11
+        env:
+          MYSQL_DATABASE: Dawn_Transportes
+          MYSQL_ROOT_PASSWORD: 150906
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -p150906" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+        extensions: mbstring, dom, fileinfo, mysql, pdo
+        coverage: none
+
+    - name: Create Custom Database User
+      run: |
+        mysql -h 127.0.0.1 -u root -p150906 -e "CREATE USER IF NOT EXISTS 'Jeremias'@'%' IDENTIFIED BY '150906'; GRANT ALL PRIVILEGES ON Dawn_Transportes.* TO 'Jeremias'@'%'; FLUSH PRIVILEGES;"
+
+    - name: Copy Environment File
+      run: cp .env.example .env
+
+    - name: Install Composer Dependencies
+      uses: ramsey/composer-install@v3
+      with:
+        working-directory: DAWN_trasnportes
+
+    - name: Generate Application Key
+      run: php artisan key:generate
+
+    - name: Run Migrations & Tests
+      env:
+        DB_CONNECTION: mysql
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_DATABASE: Dawn_Transportes
+        DB_USERNAME: Jeremias
+        DB_PASSWORD: 150906
+      run: |
+        php artisan test
