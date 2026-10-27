@@ -12,13 +12,13 @@ jobs:
 
     services:
       mysql:
-        image: mariadb:latest
+        image: mariadb:10.11
         env:
           MYSQL_DATABASE: Dawn_Transportes
           MYSQL_ROOT_PASSWORD: 150906
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="mysqladmin ping -p150906" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - name: Checkout code
