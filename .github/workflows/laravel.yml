@@ -36,7 +36,7 @@ jobs:
         mysql -h 127.0.0.1 -u root -p150906 -e "CREATE USER IF NOT EXISTS 'Jeremias'@'%' IDENTIFIED BY '150906'; GRANT ALL PRIVILEGES ON Dawn_Transportes.* TO 'Jeremias'@'%'; FLUSH PRIVILEGES;"
 
     - name: Copy Environment File
-      run: cp .env.example .env
+      run: cp DAWN_trasnportes/.env.example .env
 
     - name: Install Composer Dependencies
       uses: ramsey/composer-install@v3
