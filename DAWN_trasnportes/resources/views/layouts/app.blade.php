@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dawn Transportes</title>
     <!-- Directiva de Laravel para cargar Tailwind CSS a través de Vite -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite('resources/css/app.css')
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col font-sans">
+<body class="{{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'bg-[#e6e7e8]' : 'bg-slate-50' }} min-h-screen flex flex-col font-sans">
 
     @include('partials.header')
 
-    <main class="flex-grow flex items-center justify-center py-10">
+    <main class="grow flex {{ request()->routeIs('home', 'viajes.show') ? 'items-start justify-center py-4' : 'items-center justify-center py-10' }} {{ request()->routeIs('login', 'register') ? 'min-h-[calc(100vh-62px)]' : '' }}">
         @yield('content')
     </main>
 
-    @include('partials.footer')
+    @unless (request()->routeIs('login', 'register', 'home', 'viajes.show'))
+        @include('partials.footer')
+    @endunless
 
 </body>
 </html>

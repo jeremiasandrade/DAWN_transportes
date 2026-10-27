@@ -1,3 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+.trip-detail-summary {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 640px) {
+	.trip-detail-summary {
+		grid-template-columns: 112px minmax(0, 1fr) 164px;
+	}
+}

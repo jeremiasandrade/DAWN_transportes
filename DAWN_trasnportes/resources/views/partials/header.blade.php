@@ -1,5 +1,5 @@
-<header class="flex w-full items-center justify-between p-4 md:px-12 bg-sky-100 shadow-md">
-    <div class="text-2xl font-bold text-slate-800">
+<header class="flex w-full items-center justify-between bg-sky-100 shadow-md {{ request()->routeIs('viajes.show') ? 'h-14 px-4 md:px-8' : (request()->routeIs('login', 'register', 'home') ? 'h-15.5 px-4 py-2.5 md:px-9' : 'p-4 md:px-12') }}">
+    <div class="{{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'text-xl' : 'text-2xl' }} font-bold text-slate-800">
         Dawn Transportes
     </div>
     
@@ -9,7 +9,7 @@
     <!-- Action Buttons -->
     <div class="flex items-center gap-4">
         <button 
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
+            class="flex {{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'h-10 w-10' : 'h-12 w-12' }} items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
             aria-label="Buscar destino"
         >
             <!-- SVG para Search -->
@@ -20,7 +20,7 @@
         </button>
 
         <button 
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
+            class="flex {{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'h-10 w-10' : 'h-12 w-12' }} items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
             aria-label="Colectivos"
         >
             <!-- SVG para Bus -->
@@ -36,7 +36,7 @@
         </button>
 
         <button 
-            class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
+            class="flex {{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'h-10 w-10' : 'h-12 w-12' }} items-center justify-center overflow-hidden rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
             aria-label="Perfil de usuario"
         >
             <!-- SVG para User -->
