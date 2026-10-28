@@ -31,9 +31,9 @@ return [
     | key is the base namespace to resolve the class name.
     |
     */
-    'analyzer_paths' => [
+    'analyzer_paths' => class_exists(\BaerSoftware\LaraBeacon\LaraBeacon::class) ? [
         'BaerSoftware\\LaraBeacon\\Analyzers' => \BaerSoftware\LaraBeacon\LaraBeacon::analyzerPath(),
-    ],
+    ] : [],
 
     /*
     |--------------------------------------------------------------------------

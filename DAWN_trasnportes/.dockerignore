@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.git
+.idea
+.vscode
+node_modules
+vendor
+public/build
+public/hot
+bootstrap/cache/*.php
+!bootstrap/cache/.gitignore
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*

@@ -4,58 +4,57 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: dawn_transportes_app
-    restart: always
+    restart: unless-stopped
     environment:
-      - DB_CONNECTION=mysql
-      - DB_HOST=mariadb_database
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-dawn_transportes}
-      - DB_USERNAME=${DB_USERNAME:-Jeremias}
-      - DB_PASSWORD=${DB_PASSWORD:-197328}
-      - MAIL_MAILER=smtp
-      - MAIL_HOST=mailpit
-      - MAIL_PORT=1025
-      - MAIL_ENCRYPTION=null
-    depends_on:
-      - mariadb_database
-      - mailpit
-    networks:
-      - dawn_network
-
-  nginx_web:
-    image: nginx:alpine
-    container_name: dawn_transportes_nginx
-    restart: always
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY:?Define APP_KEY en .env}
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb_database
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:?Define DB_DATABASE en .env}
+      DB_USERNAME: ${DB_USERNAME:?Define DB_USERNAME en .env}
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
     ports:
       - "8000:80"
-    volumes:
-      - ./:/var/www/html
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - dawn_transportes
+      mariadb_database:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
     networks:
       - dawn_network
 
   mariadb_database:
     image: docker.io/library/mariadb:10.11
     container_name: dawn_transportes_db
-    restart: always
+    restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-dawn_transportes}
-      MYSQL_USER: ${DB_USERNAME:-Jeremias}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-197328}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-197328}
+      MYSQL_DATABASE: ${DB_DATABASE:?Define DB_DATABASE en .env}
+      MYSQL_USER: ${DB_USERNAME:?Define DB_USERNAME en .env}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-${DB_PASSWORD:?Define DB_PASSWORD en .env}}
     ports:
       - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     networks:
       - dawn_network
 
   mailpit:
     image: axllent/mailpit
     container_name: dawn_transportes_mailpit
-    restart: always
+    restart: unless-stopped
     ports:
       - "1025:1025" # Puerto SMTP
       - "8025:8025" # Interfaz Web para ver correos
