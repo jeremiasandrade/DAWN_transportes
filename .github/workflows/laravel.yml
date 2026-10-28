@@ -47,6 +47,19 @@ jobs:
       with:
         working-directory: DAWN_trasnportes
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+        cache-dependency-path: DAWN_trasnportes/package-lock.json
+
+    - name: Install NPM dependencies
+      run: npm ci
+
+    - name: Build frontend assets
+      run: npm run build
+
     - name: Generate Application Key
       run: php artisan key:generate
 
