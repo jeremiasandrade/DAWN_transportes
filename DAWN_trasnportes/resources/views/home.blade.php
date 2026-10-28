@@ -6,7 +6,14 @@
             ['id' => 1, 'route' => 'Leandro N. Alem - Posadas', 'discount' => '15% OFF', 'price' => '$8.500', 'vehicle' => 'Minibús'],
             ['id' => 2, 'route' => 'Leandro N. Alem - Córdoba', 'discount' => '20% OFF', 'price' => '$45.000', 'vehicle' => 'Ómnibus de doble piso'],
             ['id' => 3, 'route' => 'Leandro N. Alem - Buenos Aires', 'discount' => '10% OFF', 'price' => '$55.000', 'vehicle' => 'Piso elevado'],
+            ['id' => 4, 'route' => 'Leandro N. Alem - Corrientes', 'discount' => '12% OFF', 'price' => '$12.000', 'vehicle' => 'Minibús'],
+            ['id' => 5, 'route' => 'Leandro N. Alem - Resistencia', 'discount' => '10% OFF', 'price' => '$18.500', 'vehicle' => 'Ómnibus de doble piso'],
+            ['id' => 6, 'route' => 'Leandro N. Alem - Formosa', 'discount' => '8% OFF', 'price' => '$22.000', 'vehicle' => 'Piso elevado'],
+            ['id' => 7, 'route' => 'Leandro N. Alem - Tucumán', 'discount' => '15% OFF', 'price' => '$39.000', 'vehicle' => 'Ómnibus de doble piso'],
+            ['id' => 8, 'route' => 'Leandro N. Alem - Salta', 'discount' => '10% OFF', 'price' => '$46.000', 'vehicle' => 'Piso elevado'],
+            ['id' => 9, 'route' => 'Leandro N. Alem - Mendoza', 'discount' => '18% OFF', 'price' => '$58.000', 'vehicle' => 'Ómnibus de doble piso'],
         ];
+        $offerPages = array_chunk($offers, 3);
     @endphp
 
     <div class="mx-auto flex w-[calc(100%-2rem)] flex-col gap-10 pb-8 md:w-[85%] md:max-w-6xl">
@@ -82,8 +89,11 @@
                 <h1 class="text-xl font-bold text-slate-800 md:text-2xl">Ofertas y Destinos Destacados</h1>
             </div>
 
-            <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-                @foreach ($offers as $offer)
+            <div data-trip-carousel aria-roledescription="carrusel" aria-label="Viajes destacados">
+                <div data-carousel-pages>
+                    @foreach ($offerPages as $pageIndex => $pageOffers)
+                        <div data-carousel-page="{{ $pageIndex }}" class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                            @foreach ($pageOffers as $offer)
                     <article class="flex min-w-0 flex-col overflow-hidden rounded-[20px] border border-sky-200/50 bg-sky-100/80 shadow-sm">
                         <div class="h-44 shrink-0 bg-slate-200/70" aria-hidden="true"></div>
                         <div class="flex flex-1 flex-col p-4">
@@ -102,8 +112,80 @@
                             <a href="{{ route('viajes.show', $offer['id']) }}" class="mt-auto block w-full rounded-xl bg-[#0284c7] py-3 text-center text-sm font-bold text-white shadow-md transition-colors hover:bg-[#0369a1] focus:outline-none focus:ring-4 focus:ring-sky-300">Reservar pasaje</a>
                         </div>
                     </article>
-                @endforeach
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="mt-5 flex items-center justify-between gap-4" aria-label="Controles de viajes destacados">
+                    <button type="button" data-carousel-previous class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-colors hover:bg-sky-50 hover:text-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400" aria-label="Página anterior">
+                        <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <div class="flex items-center justify-center gap-2" role="group" aria-label="Seleccionar página">
+                        @foreach ($offerPages as $pageIndex => $pageOffers)
+                            <button type="button" data-carousel-indicator="{{ $pageIndex }}" class="h-2.5 w-2.5 rounded-full bg-slate-300 transition-colors hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2" aria-label="Mostrar página {{ $pageIndex + 1 }}" aria-current="{{ $pageIndex === 0 ? 'true' : 'false' }}"></button>
+                        @endforeach
+                    </div>
+                    <button type="button" data-carousel-next class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-colors hover:bg-sky-50 hover:text-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400" aria-label="Página siguiente">
+                        <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
             </div>
         </section>
     </div>
+
+    <script>
+        (() => {
+            const carousel = document.querySelector('[data-trip-carousel]');
+
+            if (!carousel) {
+                return;
+            }
+
+            const pages = Array.from(carousel.querySelectorAll('[data-carousel-page]'));
+            const indicators = Array.from(carousel.querySelectorAll('[data-carousel-indicator]'));
+            let activePage = 0;
+            let rotationTimer;
+
+            const showPage = (pageIndex) => {
+                activePage = (pageIndex + pages.length) % pages.length;
+
+                pages.forEach((page, index) => {
+                    page.classList.toggle('hidden', index !== activePage);
+                });
+
+                indicators.forEach((indicator, index) => {
+                    const isActive = index === activePage;
+                    indicator.setAttribute('aria-current', String(isActive));
+                    indicator.classList.toggle('bg-sky-600', isActive);
+                    indicator.classList.toggle('bg-slate-300', !isActive);
+                });
+            };
+
+            const startRotation = () => {
+                window.clearInterval(rotationTimer);
+                rotationTimer = window.setInterval(() => showPage(activePage + 1), 6000);
+            };
+
+            carousel.querySelector('[data-carousel-previous]').addEventListener('click', () => {
+                showPage(activePage - 1);
+                startRotation();
+            });
+
+            carousel.querySelector('[data-carousel-next]').addEventListener('click', () => {
+                showPage(activePage + 1);
+                startRotation();
+            });
+
+            indicators.forEach((indicator) => {
+                indicator.addEventListener('click', () => {
+                    showPage(Number(indicator.dataset.carouselIndicator));
+                    startRotation();
+                });
+            });
+
+            showPage(0);
+            startRotation();
+        })();
+    </script>
 @endsection

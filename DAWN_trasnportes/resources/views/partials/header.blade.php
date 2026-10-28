@@ -35,7 +35,8 @@
             </svg>
         </button>
 
-        <button 
+        <a
+            href="{{ auth()->check() ? route('profile') : route('register') }}"
             class="flex {{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'h-10 w-10' : 'h-12 w-12' }} items-center justify-center overflow-hidden rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
             aria-label="Perfil de usuario"
         >
@@ -44,6 +45,6 @@
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
             </svg>
-        </button>
+        </a>
     </div>
 </header>

@@ -19,6 +19,8 @@ Route::resource('pagos', PagoController::class);
 
 Route::view('/', 'home')->name('home');
 
+Route::view('/perfil', 'usuario.perfil')->middleware('auth')->name('profile');
+
 Route::redirect('/dashboard', '/')->name('dashboard.index');
 
 // Ruta para mostrar la vista de Login
