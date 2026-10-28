@@ -1,5 +1,113 @@
 @import "tailwindcss";
 
+html {
+	color-scheme: light;
+}
+
+html.dark {
+	color-scheme: dark;
+}
+
+html.dark body {
+	background-color: #111a22;
+	color: #e4edf3;
+}
+
+html.dark header {
+	background-color: #172a39;
+}
+
+html.dark .bg-white,
+html.dark .bg-white\/75,
+html.dark .bg-white\/70,
+html.dark .bg-white\/50 {
+	background-color: #202f3b;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-100,
+html.dark .bg-slate-200\/70 {
+	background-color: #1b2934;
+}
+
+html.dark .bg-sky-50,
+html.dark .bg-sky-50\/70,
+html.dark .bg-sky-100,
+html.dark .bg-sky-100\/80 {
+	background-color: #203545;
+}
+
+html.dark .bg-green-100,
+html.dark .bg-emerald-50 {
+	background-color: #153a33;
+}
+
+html.dark .bg-amber-50 {
+	background-color: #3a3020;
+}
+
+html.dark .bg-red-100 {
+	background-color: #442a2d;
+}
+
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700 {
+	color: #e4edf3;
+}
+
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+	color: #afbec9;
+}
+
+html.dark .text-slate-400 {
+	color: #91a2af;
+}
+
+html.dark .text-sky-800,
+html.dark .text-sky-700 {
+	color: #71c9f3;
+}
+
+html.dark .text-emerald-800,
+html.dark .text-green-700 {
+	color: #76d8ad;
+}
+
+html.dark .text-amber-600 {
+	color: #f3c96d;
+}
+
+html.dark .border-sky-100,
+html.dark .border-sky-200,
+html.dark .border-sky-200\/50,
+html.dark .border-sky-200\/60,
+html.dark .border-sky-200\/70,
+html.dark .border-slate-100,
+html.dark .border-slate-200 {
+	border-color: #354958;
+}
+
+html.dark .border-b.border-sky-200\/70 {
+	border-bottom-color: #354958;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+	color-scheme: dark;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+	color: #91a2af;
+}
+
+html.dark footer {
+	background-color: #0c1319;
+}
+
 .trip-detail-summary {
 	grid-template-columns: minmax(0, 1fr);
 }

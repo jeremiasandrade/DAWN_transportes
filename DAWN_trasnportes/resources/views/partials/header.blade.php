@@ -1,13 +1,24 @@
 <header class="flex w-full items-center justify-between bg-sky-100 shadow-md {{ request()->routeIs('viajes.show') ? 'h-14 px-4 md:px-8' : (request()->routeIs('login', 'register', 'home') ? 'h-15.5 px-4 py-2.5 md:px-9' : 'p-4 md:px-12') }}">
-    <div class="{{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'text-xl' : 'text-2xl' }} font-bold text-slate-800">
+    <a href="{{ route('home') }}" aria-label="Dawn Transportes, ir al inicio" class="{{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'text-xl' : 'text-2xl' }} font-bold text-slate-800">
         Dawn Transportes
-    </div>
+    </a>
     
     <!-- Spacer in the middle -->
     <div class="flex-1"></div>
 
     <!-- Action Buttons -->
     <div class="flex items-center gap-4">
+        <button
+            type="button"
+            data-theme-toggle
+            class="flex {{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'h-10 w-10' : 'h-12 w-12' }} items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
+            aria-label="Cambiar a tema oscuro"
+            title="Cambiar a tema oscuro"
+        >
+            <svg data-theme-icon="moon" aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg>
+            <svg data-theme-icon="sun" aria-hidden="true" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+        </button>
+
         <button 
             class="flex {{ request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'h-10 w-10' : 'h-12 w-12' }} items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-sky-600 hover:shadow"
             aria-label="Buscar destino"

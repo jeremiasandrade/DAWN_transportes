@@ -3,6 +3,7 @@
 use App\Http\Controllers\DestinoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UserController;
@@ -19,7 +20,12 @@ Route::resource('pagos', PagoController::class);
 
 Route::view('/', 'home')->name('home');
 
-Route::view('/perfil', 'usuario.perfil')->middleware('auth')->name('profile');
+Route::middleware('auth')->group(function () {
+    Route::get('/perfil', [ProfileController::class, 'show'])->name('profile');
+    Route::put('/perfil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/perfil/contrasena', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::post('/logout', [ProfileController::class, 'logout'])->name('logout');
+});
 
 Route::redirect('/dashboard', '/')->name('dashboard.index');
 

@@ -31,6 +31,9 @@ test('the home page renders the trip search and offer cards', function () {
     $response = $this->get(route('home'));
 
     $response->assertOk()
+        ->assertSee('href="'.route('home').'"', false)
+        ->assertSee('data-theme-toggle', false)
+        ->assertSee('Cambiar a tema oscuro')
         ->assertSee('Buscar Viajes disponibles')
         ->assertSee('Ofertas y Destinos Destacados')
         ->assertSee('Leandro N. Alem - Posadas')
@@ -67,11 +70,86 @@ test('an authenticated user is sent to the empty profile page', function () {
 
     $homeResponse->assertOk()
         ->assertSee('href="'.route('profile').'"', false);
-    $profileResponse->assertOk();
+    $profileResponse->assertOk()
+        ->assertSee('Mi cuenta')
+        ->assertSee('Mis datos')
+        ->assertSee('Cerrar sesión');
 });
 
 test('a visitor cannot access the profile page', function () {
     $response = $this->get(route('profile'));
 
     $response->assertRedirect(route('login'));
+});
+
+test('an authenticated user can update their profile information', function () {
+    $user = User::factory()->create([
+        'first_name' => 'Ana',
+        'last_name' => 'Pérez',
+        'dni' => '12345678',
+        'gender' => 'femenino',
+        'contact' => '555123456',
+    ]);
+
+    $response = $this->actingAs($user)->put(route('profile.update'), [
+        'first_name' => 'Ana María',
+        'last_name' => 'Pérez',
+        'dni' => '12345678',
+        'gender' => 'femenino',
+        'contact' => '555987654',
+        'email' => $user->email,
+    ]);
+
+    $response->assertRedirect(route('profile'));
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'name' => 'Ana María Pérez',
+        'first_name' => 'Ana María',
+        'contact' => '555987654',
+    ]);
+});
+
+test('invalid profile updates keep the editor open for correction', function () {
+    $user = User::factory()->create([
+        'first_name' => 'Ana',
+        'last_name' => 'Pérez',
+        'dni' => '12345678',
+        'gender' => 'femenino',
+        'contact' => '555123456',
+    ]);
+
+    $response = $this->actingAs($user)->followingRedirects()->from(route('profile'))->put(route('profile.update'), [
+        'first_name' => 'Ana',
+        'last_name' => 'Pérez',
+        'dni' => '12345678',
+        'gender' => 'femenino',
+        'contact' => '555123456',
+        'email' => 'not-an-email',
+    ]);
+
+    $response->assertOk()
+        ->assertSee('data-invalid-dialog="edit"', false)
+        ->assertSee('The email field must be a valid email address.');
+});
+
+test('an authenticated user can change their password with the current password', function () {
+    $user = User::factory()->create(['password' => 'old-password']);
+
+    $response = $this->actingAs($user)->put(route('profile.password.update'), [
+        'current_password' => 'old-password',
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ]);
+
+    $response->assertRedirect(route('profile'));
+    $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+});
+
+test('a user can end their session from the profile page', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post(route('logout'));
+
+    $response->assertRedirect(route('home'));
+    $this->assertGuest();
 });
