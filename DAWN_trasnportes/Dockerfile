@@ -36,4 +36,4 @@ RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-availabl
 
 EXPOSE 80
 
-CMD ["sh", "-c", "php artisan migrate --force && exec apache2-foreground"]
+CMD ["apache2-foreground"]
