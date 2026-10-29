@@ -1,0 +1,95 @@
+UTILIDADES DEL PROYECTO DAWN TRANSPORTES
+========================================
+
+DESARROLLO LOCAL
+----------------
+
+composer install
+Instala las dependencias PHP definidas en composer.lock.
+
+cp .env.example .env
+Crea la configuración local a partir de la plantilla de entorno.
+
+touch database/database.sqlite
+Crea el archivo SQLite usado por defecto en el entorno local.
+
+php artisan key:generate
+Genera la clave de cifrado de Laravel y la guarda en .env.
+
+php artisan migrate
+Ejecuta las migraciones pendientes en la base de datos configurada.
+
+php artisan serve
+Levanta el servidor de desarrollo de Laravel; por defecto queda en http://127.0.0.1:8000.
+
+npm install
+Instala las dependencias JavaScript del proyecto.
+
+npm run dev
+Inicia Vite para compilar y servir los recursos del frontend durante el desarrollo.
+
+npm run build
+Compila los recursos del frontend para producción.
+
+MIGRACIONES Y PRUEBAS
+---------------------
+
+php artisan make:migration create_nombre_tabla_table --create=nombre_tabla
+Crea una migración para una tabla nueva. Sustituye nombre_tabla por el nombre deseado.
+
+php artisan make:migration add_campo_to_nombre_tabla_table --table=nombre_tabla
+Crea una migración para modificar una tabla existente.
+
+php artisan migrate:status
+Muestra qué migraciones ya se ejecutaron y cuáles están pendientes.
+
+php artisan migrate:rollback
+Revierte el último lote de migraciones. Úsalo con cuidado si ya hay datos importantes.
+
+php artisan migrate:fresh
+Elimina todas las tablas y vuelve a ejecutar las migraciones. BORRA los datos existentes.
+
+composer test
+Limpia la caché de configuración y ejecuta la suite de pruebas Laravel/Pest.
+
+PODMAN COMPOSE
+--------------
+
+Antes de iniciar los contenedores, configura en .env APP_KEY, DB_DATABASE,
+DB_USERNAME y DB_PASSWORD. APP_KEY se puede generar con php artisan key:generate.
+Podman debe tener disponible un proveedor compatible con `podman compose`.
+
+podman compose up -d --build
+Construye la imagen y levanta en segundo plano la aplicación, MariaDB y Mailpit.
+La aplicación se publica en http://localhost:8000.
+
+podman compose ps
+Muestra el estado de los servicios del proyecto.
+
+podman compose logs -f dawn_transportes
+Sigue en tiempo real los registros del contenedor de la aplicación.
+
+podman compose exec dawn_transportes php artisan migrate --force
+Ejecuta las migraciones pendientes dentro del contenedor, sin el modo interactivo.
+Ejecuta este comando después de iniciar el servicio y cada vez que agregues migraciones.
+
+podman compose exec dawn_transportes php artisan migrate:status
+Consulta el estado de las migraciones en la base de datos del contenedor.
+
+podman compose exec dawn_transportes php artisan
+Abre la lista de comandos Artisan disponibles dentro del contenedor.
+
+podman compose down
+Detiene y elimina los contenedores y la red del proyecto; conserva el volumen de MariaDB.
+
+ACTUALIZAR LA APLICACIÓN EN PODMAN
+----------------------------------
+
+podman compose up -d --build
+Reconstruye la imagen con los cambios locales y recrea los servicios necesarios.
+
+podman compose exec dawn_transportes php artisan migrate --force
+Aplica las nuevas migraciones a la base de datos persistente después de actualizar.
+
+Las dos instrucciones anteriores se ejecutan en ese orden. El volumen `mariadb_data`
+conserva los datos al reconstruir la aplicación o ejecutar `podman compose down`.
