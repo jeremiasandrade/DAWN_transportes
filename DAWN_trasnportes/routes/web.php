@@ -3,17 +3,23 @@
 use App\Http\Controllers\DestinoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\PasajeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ReservaController;
+use App\Http\Controllers\RutaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ViajeController;
+use App\Models\Ciudad;
 use Illuminate\Support\Facades\Route;
 
 Route::resource('usuarios', UserController::class);
 Route::resource('vehiculos', VehiculoController::class);
+Route::model('destino', Ciudad::class);
 Route::resource('destinos', DestinoController::class);
+Route::resource('rutas', RutaController::class);
+Route::resource('pasajes', PasajeController::class);
 Route::resource('viajes', ViajeController::class);
 Route::resource('reservas', ReservaController::class);
 Route::resource('pagos', PagoController::class);

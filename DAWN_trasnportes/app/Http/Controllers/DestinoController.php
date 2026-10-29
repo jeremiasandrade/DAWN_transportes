@@ -2,63 +2,84 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ciudad;
+use App\Models\Provincia;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class DestinoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        //
+        $ciudades = Ciudad::with('provincia')->orderBy('nombre_ciudad')->get();
+
+        return view('destino.index', compact('ciudades'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('destino.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+        $validated = $request->validate([
+            'nombre_ciudad' => ['required', 'string', 'max:45', 'unique:ciudades,nombre_ciudad'],
+            'provincia' => ['required', 'string', 'max:45'],
+        ]);
+
+        $provincia = Provincia::firstOrCreate([
+            'nombre_provincia' => $validated['provincia'],
+        ]);
+
+        Ciudad::create([
+            'nombre_ciudad' => $validated['nombre_ciudad'],
+            'provincia_id' => $provincia->id_provincia,
+        ]);
+
+        return redirect()->route('destinos.index')->with('success', 'Destino creado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Ciudad $destino): View
     {
-        //
+        $destino->load(['provincia', 'rutasOrigen.destino', 'rutasDestino.origen']);
+
+        return view('destino.show', compact('destino'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Ciudad $destino): View
     {
-        //
+        return view('destino.edit', compact('destino'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Ciudad $destino): RedirectResponse
     {
-        //
+        $validated = $request->validate([
+            'nombre_ciudad' => ['required', 'string', 'max:45', 'unique:ciudades,nombre_ciudad,'.$destino->id_ciudad.',id_ciudad'],
+            'provincia' => ['required', 'string', 'max:45'],
+        ]);
+
+        $provincia = Provincia::firstOrCreate([
+            'nombre_provincia' => $validated['provincia'],
+        ]);
+
+        $destino->update([
+            'nombre_ciudad' => $validated['nombre_ciudad'],
+            'provincia_id' => $provincia->id_provincia,
+        ]);
+
+        return redirect()->route('destinos.index')->with('success', 'Destino actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Ciudad $destino): RedirectResponse
     {
-        //
+        if ($destino->rutasOrigen()->exists() || $destino->rutasDestino()->exists()) {
+            return back()->with('error', 'No se puede eliminar el destino porque tiene rutas asociadas.');
+        }
+
+        $destino->delete();
+
+        return redirect()->route('destinos.index')->with('success', 'Destino eliminado correctamente.');
     }
 }
