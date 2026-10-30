@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'osrm' => [
+        'base_url' => env('OSRM_BASE_URL', 'https://router.project-osrm.org'),
+        'timeout' => env('OSRM_TIMEOUT', 15),
+        'user_agent' => env('OSRM_USER_AGENT', 'DawnTransportes/1.0'),
+    ],
+
+    'georef' => [
+        'base_url' => env('GEOREF_BASE_URL', 'https://apis.datos.gob.ar/georef/api'),
+        'timeout' => env('GEOREF_TIMEOUT', 60),
+    ],
+
 ];

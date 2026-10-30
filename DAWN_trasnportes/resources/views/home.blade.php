@@ -25,7 +25,16 @@
                         <div class="relative">
                             <svg aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                             <select id="origin" name="origin" class="w-full appearance-none rounded-xl border border-sky-100 bg-white py-3.5 pl-10 pr-9 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-sky-400">
-                                <option value="Leandro N. Alem" selected>Leandro N. Alem</option>
+                                <option value="">Seleccionar origen</option>
+                                @foreach($ciudades->groupBy(fn ($ciudad) => $ciudad->provincia?->nombre_provincia ?? 'Sin provincia') as $provincia => $grupo)
+                                    <optgroup label="{{ $provincia }}">
+                                        @foreach($grupo as $ciudad)
+                                            <option value="{{ $ciudad->id_ciudad }}" @selected($origenSeleccionado?->id_ciudad === $ciudad->id_ciudad)>
+                                                {{ $ciudad->nombre_ciudad }}@if($ciudad->departamento) — {{ $ciudad->departamento }}@endif
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
                             </select>
                             <svg aria-hidden="true" class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
@@ -36,16 +45,16 @@
                         <div class="relative">
                             <svg aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                             <select id="destination" name="destination" class="w-full appearance-none rounded-xl border border-sky-100 bg-white py-3.5 pl-10 pr-9 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-sky-400">
-                                <option value="" disabled selected>Capital provincial</option>
-                                <option value="Posadas">Posadas, Misiones</option>
-                                <option value="Corrientes">Corrientes, Corrientes</option>
-                                <option value="Resistencia">Resistencia, Chaco</option>
-                                <option value="Formosa">Formosa, Formosa</option>
-                                <option value="Córdoba">Córdoba, Córdoba</option>
-                                <option value="Buenos Aires">Buenos Aires (CABA)</option>
-                                <option value="Mendoza">Mendoza, Mendoza</option>
-                                <option value="Salta">Salta, Salta</option>
-                                <option value="San Miguel de Tucumán">Tucumán</option>
+                                <option value="">Seleccionar destino</option>
+                                @foreach($ciudades->groupBy(fn ($ciudad) => $ciudad->provincia?->nombre_provincia ?? 'Sin provincia') as $provincia => $grupo)
+                                    <optgroup label="{{ $provincia }}">
+                                        @foreach($grupo as $ciudad)
+                                            <option value="{{ $ciudad->id_ciudad }}" @selected($destinoSeleccionado?->id_ciudad === $ciudad->id_ciudad)>
+                                                {{ $ciudad->nombre_ciudad }}@if($ciudad->departamento) — {{ $ciudad->departamento }}@endif
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
                             </select>
                             <svg aria-hidden="true" class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
@@ -81,6 +90,33 @@
                     </button>
                 </div>
             </form>
+
+            @if($busquedaRealizada)
+                <div class="mt-5 rounded-xl border border-sky-200 bg-white p-4 shadow-sm">
+                    @if($mensajeDistancia)
+                        <p class="text-sm font-semibold text-amber-700">{{ $mensajeDistancia }}</p>
+                    @else
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase text-slate-400">Recorrido seleccionado</p>
+                                <p class="text-base font-extrabold text-slate-800">
+                                    {{ $origenSeleccionado->nombre_ciudad }} → {{ $destinoSeleccionado->nombre_ciudad }}
+                                </p>
+                                <p class="text-xs text-slate-500">
+                                    {{ $origenSeleccionado->provincia?->nombre_provincia }} → {{ $destinoSeleccionado->provincia?->nombre_provincia }}
+                                </p>
+                            </div>
+                            <div class="rounded-xl bg-sky-100 px-4 py-2 text-right">
+                                <p class="text-[10px] font-bold uppercase text-sky-700">Distancia real</p>
+                                <p class="text-2xl font-black text-sky-700">{{ number_format($distancia, 0, ',', '.') }} km</p>
+                            </div>
+                        </div>
+                        @if($rutaExistente)
+                            <p class="mt-3 text-xs font-semibold text-green-700">Ruta registrada en el sistema.</p>
+                        @endif
+                    @endif
+                </div>
+            @endif
         </section>
 
         <section>

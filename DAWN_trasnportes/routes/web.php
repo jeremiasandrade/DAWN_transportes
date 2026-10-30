@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DestinoController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\PasajeController;
@@ -19,13 +20,14 @@ Route::resource('usuarios', UserController::class);
 Route::resource('vehiculos', VehiculoController::class);
 Route::model('destino', Ciudad::class);
 Route::resource('destinos', DestinoController::class);
+Route::get('rutas/distancia', [RutaController::class, 'distancia'])->name('rutas.distancia');
 Route::resource('rutas', RutaController::class);
 Route::resource('pasajes', PasajeController::class);
 Route::resource('viajes', ViajeController::class);
 Route::resource('reservas', ReservaController::class);
 Route::resource('pagos', PagoController::class);
 
-Route::view('/', 'home')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/perfil', [ProfileController::class, 'show'])->name('profile');

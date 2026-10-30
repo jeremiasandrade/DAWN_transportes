@@ -16,8 +16,37 @@ class Ciudad extends Model
 
     protected $fillable = [
         'nombre_ciudad',
+        'departamento',
         'provincia_id',
+        'latitud',
+        'longitud',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'id_ciudad' => 'integer',
+            'provincia_id' => 'integer',
+            'latitud' => 'float',
+            'longitud' => 'float',
+        ];
+    }
+
+    public function getEtiquetaAttribute(): string
+    {
+        $ubicacion = collect([$this->departamento, $this->provincia?->nombre_provincia])
+            ->filter()
+            ->implode(', ');
+
+        return $ubicacion === ''
+            ? $this->nombre_ciudad
+            : "{$this->nombre_ciudad} ({$ubicacion})";
+    }
+
+    public function tieneCoordenadas(): bool
+    {
+        return $this->latitud !== null && $this->longitud !== null;
+    }
 
     public function provincia(): BelongsTo
     {
