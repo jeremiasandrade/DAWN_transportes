@@ -64,7 +64,7 @@
                         <label for="date" class="ml-1 text-xs font-semibold text-slate-600">Fecha de viaje</label>
                         <div class="relative">
                             <svg aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                            <input id="date" name="date" type="date" class="w-full rounded-xl border border-sky-100 bg-white py-3.5 pl-10 pr-3 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-sky-400" />
+                            <input id="date" name="date" type="date" value="{{ $fechaInput }}" class="w-full rounded-xl border border-sky-100 bg-white py-3.5 pl-10 pr-3 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-sky-400" />
                         </div>
                     </div>
 
@@ -73,10 +73,10 @@
                         <div class="relative">
                             <svg aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6M15 6v6M2 12h19.6M18 18h3l.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
                             <select id="vehicle" name="vehicle" class="w-full appearance-none rounded-xl border border-sky-100 bg-white py-3.5 pl-10 pr-9 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-sky-400">
-                                <option value="" disabled selected>Seleccionar tipo</option>
-                                <option value="minibus">Minibús</option>
-                                <option value="doble-piso">Ómnibus de doble piso</option>
-                                <option value="piso-elevado">Piso elevado</option>
+                                <option value="" disabled @selected($tipoVehiculo === null)>Seleccionar tipo</option>
+                                @foreach($tiposVehiculo as $valor => $tipo)
+                                    <option value="{{ $valor }}" @selected($tipoVehiculo === $valor)>{{ $tipo['etiqueta'] }}</option>
+                                @endforeach
                             </select>
                             <svg aria-hidden="true" class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
@@ -111,6 +111,63 @@
                                 <p class="text-2xl font-black text-sky-700">{{ number_format($distancia, 0, ',', '.') }} km</p>
                             </div>
                         </div>
+
+                        @if($resumenDisponible)
+                            <div class="mt-4 grid grid-cols-1 gap-2.5 border-t border-sky-100 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+                                <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                                    <p class="text-[9px] font-bold uppercase text-slate-400">Fecha de viaje</p>
+                                    <p class="mt-0.5 text-sm font-bold text-slate-700">{{ $fechaViaje->format('d/m/Y') }}</p>
+                                </div>
+                                <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                                    <p class="text-[9px] font-bold uppercase text-slate-400">Tipo de vehículo</p>
+                                    <p class="mt-0.5 text-sm font-bold text-slate-700">{{ $tipoVehiculoEtiqueta }}</p>
+                                </div>
+                                <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                                    <p class="text-[9px] font-bold uppercase text-slate-400">Duración estimada</p>
+                                    <p class="mt-0.5 text-sm font-bold text-slate-700">{{ $duracion }}</p>
+                                </div>
+                                <div class="rounded-xl bg-slate-900 p-3 text-white shadow-sm">
+                                    <p class="text-[9px] font-bold uppercase text-sky-200">Precio estimado</p>
+                                    <p class="text-xl font-black">$ {{ number_format($precioEstimado, 0, ',', '.') }}</p>
+                                </div>
+                            </div>
+
+                            <p class="mt-2 text-[10px] leading-4 text-slate-500">
+                                Estimado con la Base Tarifaria de Aplicación oficial de $ {{ number_format($tarifaReferencia, 2, ',', '.') }} por pasajero-km (agosto 2026). El precio final puede variar según la empresa y la anticipación.
+                            </p>
+
+                            <div class="mt-4 border-t border-sky-100 pt-4">
+                                <div class="mb-2.5 flex items-center gap-2">
+                                    <svg aria-hidden="true" class="h-5 w-5 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
+                                    <h3 class="text-sm font-bold text-slate-800">Opciones de pago</h3>
+                                </div>
+                                @php
+                                    $metodosPago = [
+                                        ['nombre' => 'Mercado Pago', 'detalle' => 'Saldo o tarjeta', 'icono' => '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>'],
+                                        ['nombre' => 'Tarjeta de crédito', 'detalle' => 'Hasta 3 cuotas sin interés', 'icono' => '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/><path d="M6 15h2"/></svg>'],
+                                        ['nombre' => 'Tarjeta de débito', 'detalle' => 'Pago inmediato', 'icono' => '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>'],
+                                        ['nombre' => 'Transferencia bancaria', 'detalle' => 'Transferencia o depósito', 'icono' => '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 10V21"/><path d="M19 10V21"/><path d="m12 3 9 7H3l9-7Z"/></svg>'],
+                                    ];
+                                @endphp
+                                <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+                                    @foreach($metodosPago as $metodo)
+                                        <div class="flex items-start gap-2.5 rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600">
+                                                {!! $metodo['icono'] !!}
+                                            </span>
+                                            <div class="min-w-0">
+                                                <p class="text-xs font-bold text-slate-700">{{ $metodo['nombre'] }}</p>
+                                                <p class="mt-0.5 text-[10px] leading-4 text-slate-500">{{ $metodo['detalle'] }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <p class="mt-2 text-[10px] text-slate-500">El medio de pago y la disponibilidad de asientos se confirman al continuar con la reserva.</p>
+                            </div>
+                        @elseif($mensajeResumen)
+                            <p class="mt-3 text-xs font-semibold text-amber-700">{{ $mensajeResumen }}</p>
+                        @endif
+
                         @if($rutaExistente)
                             <p class="mt-3 text-xs font-semibold text-green-700">Ruta registrada en el sistema.</p>
                         @endif

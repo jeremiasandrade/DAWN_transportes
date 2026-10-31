@@ -8,6 +8,7 @@ test('each featured trip opens its detail page', function (string $id, string $d
         ->assertSee($price)
         ->assertSee('Ficha Técnica del Viaje')
         ->assertSee('Comprar pasaje')
+        ->assertSee('href="'.route('pagos.create', ['viaje_id' => $id]).'"', false)
         ->assertDontSee('<img', false);
 })->with([
     ['1', 'Posadas', '$8.500'],

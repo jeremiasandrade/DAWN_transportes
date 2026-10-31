@@ -16,15 +16,15 @@
     <!-- Directiva de Laravel para cargar Tailwind CSS a través de Vite -->
     @vite('resources/css/app.css')
 </head>
-<body class="{{ request()->routeIs('profile') ? 'bg-[#f7f8f5]' : (request()->routeIs('login', 'register', 'home', 'viajes.show') ? 'bg-[#e6e7e8]' : 'bg-slate-50') }} min-h-screen flex flex-col font-sans">
+<body class="{{ request()->routeIs('profile') ? 'bg-[#f7f8f5]' : (request()->routeIs('login', 'register', 'home', 'viajes.show', 'pagos.*') ? 'bg-[#e6e7e8]' : 'bg-slate-50') }} min-h-screen flex flex-col font-sans">
 
     @include('partials.header')
 
-    <main class="grow flex {{ request()->routeIs('home', 'viajes.show', 'profile') ? 'items-start justify-center py-4 md:py-8' : 'items-center justify-center py-10' }} {{ request()->routeIs('login', 'register') ? 'min-h-[calc(100vh-62px)]' : '' }}">
+    <main class="grow flex {{ request()->routeIs('home', 'viajes.show', 'profile', 'pagos.*') ? 'items-start justify-center py-4 md:py-8' : 'items-center justify-center py-10' }} {{ request()->routeIs('login', 'register') ? 'min-h-[calc(100vh-62px)]' : '' }}">
         @yield('content')
     </main>
 
-    @unless (request()->routeIs('login', 'register', 'home', 'viajes.show'))
+    @unless (request()->routeIs('login', 'register', 'home', 'viajes.show', 'pagos.*'))
         @include('partials.footer')
     @endunless
 

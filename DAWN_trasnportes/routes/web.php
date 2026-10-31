@@ -25,7 +25,9 @@ Route::resource('rutas', RutaController::class);
 Route::resource('pasajes', PasajeController::class);
 Route::resource('viajes', ViajeController::class);
 Route::resource('reservas', ReservaController::class);
-Route::resource('pagos', PagoController::class);
+Route::resource('pagos', PagoController::class)
+    ->only(['index', 'create', 'store', 'show'])
+    ->middleware('auth');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

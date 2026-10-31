@@ -24,7 +24,7 @@
                             <p class="text-[10px] font-semibold uppercase text-slate-400">Precio total</p>
                             <p class="text-2xl font-black text-sky-700">{{ $trip['price'] }}</p>
                         </div>
-                        <a href="{{ route('reservas.create', ['viaje_id' => $trip['id']]) }}" class="shrink-0 whitespace-nowrap rounded-xl bg-[#0284c7] px-3 py-3 text-center text-xs font-bold text-white shadow-md transition-colors hover:bg-[#0369a1] focus:outline-none focus:ring-4 focus:ring-sky-300">Comprar pasaje</a>
+                        <a href="{{ route('pagos.create', ['viaje_id' => $trip['id']]) }}" class="shrink-0 whitespace-nowrap rounded-xl bg-[#0284c7] px-3 py-3 text-center text-xs font-bold text-white shadow-md transition-colors hover:bg-[#0369a1] focus:outline-none focus:ring-4 focus:ring-sky-300">Comprar pasaje</a>
                     </div>
                 </div>
 
