@@ -19,7 +19,7 @@
                 <thead class="bg-sky-50/60">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Orden</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Imagen</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Imágenes</th>
                         <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Ruta/Título</th>
                         <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Precio</th>
                         <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Descuento</th>
@@ -33,11 +33,18 @@
                         <tr>
                             <td class="px-4 py-3 text-sm text-slate-700">{{ $item->orden }}</td>
                             <td class="px-4 py-3">
-                                @if($item->imagen)
-                                    <img src="{{ asset('storage/'.$item->imagen) }}" alt="Imagen viaje recomendado" class="h-12 w-20 rounded-lg object-cover">
-                                @else
-                                    <div class="h-12 w-20 rounded-lg bg-slate-200"></div>
-                                @endif
+                                <div class="flex items-center gap-2">
+                                    @if($item->imagen)
+                                        <img src="{{ asset('storage/'.$item->imagen) }}" alt="Imagen de tarjeta" title="Imagen de tarjeta" class="h-12 w-20 rounded-lg object-cover">
+                                    @else
+                                        <div class="h-12 w-20 rounded-lg bg-slate-200" title="Sin imagen de tarjeta"></div>
+                                    @endif
+                                    @if($item->imagen_portada)
+                                        <img src="{{ asset('storage/'.$item->imagen_portada) }}" alt="Imagen de portada" title="Imagen de portada" class="h-12 w-20 rounded-lg object-cover">
+                                    @else
+                                        <div class="h-12 w-20 rounded-lg bg-slate-100" title="Sin portada"></div>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-4 py-3">
                                 <div class="text-sm font-bold text-slate-800">{{ $item->titulo ?: ($item->ruta ?: 'Sin título') }}</div>

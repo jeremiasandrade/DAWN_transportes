@@ -47,13 +47,11 @@ class ViajeRecomendadoController extends Controller
             'vehiculo' => ['nullable', 'string', 'max:255'],
             'activo' => ['nullable', 'boolean'],
             'orden' => ['nullable', 'integer', 'min:0'],
-            'imagen' => ['nullable', 'image', 'max:2048'],
+            'imagen' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'imagen_portada' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        if ($request->hasFile('imagen')) {
-            $path = $request->file('imagen')->store('viajes-recomendados', 'public');
-            $validated['imagen'] = $path;
-        }
+        $validated = $this->storeImages($request, $validated);
 
         $validated['activo'] = $request->boolean('activo');
         $validated['descuento_porcentaje'] = $validated['descuento_porcentaje'] ?? 0;
@@ -87,16 +85,11 @@ class ViajeRecomendadoController extends Controller
             'vehiculo' => ['nullable', 'string', 'max:255'],
             'activo' => ['nullable', 'boolean'],
             'orden' => ['nullable', 'integer', 'min:0'],
-            'imagen' => ['nullable', 'image', 'max:2048'],
+            'imagen' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'imagen_portada' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        if ($request->hasFile('imagen')) {
-            if ($viajeRecomendado->imagen && Storage::disk('public')->exists($viajeRecomendado->imagen)) {
-                Storage::disk('public')->delete($viajeRecomendado->imagen);
-            }
-            $path = $request->file('imagen')->store('viajes-recomendados', 'public');
-            $validated['imagen'] = $path;
-        }
+        $validated = $this->storeImages($request, $validated, $viajeRecomendado);
 
         $validated['activo'] = $request->boolean('activo');
         $validated['descuento_porcentaje'] = $validated['descuento_porcentaje'] ?? 0;
@@ -112,8 +105,10 @@ class ViajeRecomendadoController extends Controller
     {
         $this->authorizeAdmin();
 
-        if ($viajeRecomendado->imagen && Storage::disk('public')->exists($viajeRecomendado->imagen)) {
-            Storage::disk('public')->delete($viajeRecomendado->imagen);
+        foreach (['imagen', 'imagen_portada'] as $imageAttribute) {
+            if ($viajeRecomendado->{$imageAttribute} && Storage::disk('public')->exists($viajeRecomendado->{$imageAttribute})) {
+                Storage::disk('public')->delete($viajeRecomendado->{$imageAttribute});
+            }
         }
 
         $viajeRecomendado->delete();
@@ -136,5 +131,29 @@ class ViajeRecomendadoController extends Controller
         if (! $isAdmin) {
             abort(403);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function storeImages(Request $request, array $validated, ?ViajeRecomendado $viajeRecomendado = null): array
+    {
+        foreach (['imagen', 'imagen_portada'] as $imageAttribute) {
+            if (! $request->hasFile($imageAttribute)) {
+                continue;
+            }
+
+            $oldImage = $viajeRecomendado?->{$imageAttribute};
+            $newImage = $request->file($imageAttribute)->store('viajes-recomendados', 'public');
+
+            if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                Storage::disk('public')->delete($oldImage);
+            }
+
+            $validated[$imageAttribute] = $newImage;
+        }
+
+        return $validated;
     }
 }

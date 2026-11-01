@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="w-full max-w-2xl mx-auto px-4 py-8">
-    <h1 class="mb-6 text-3xl font-bold text-slate-800 dark:text-slate-100">Crear destino</h1>
+    <h1 class="mb-6 text-3xl font-bold text-slate-100 dark:text-slate-100">Crear destino</h1>
 
     <form action="{{ route('destinos.store') }}" method="POST" class="rounded bg-white p-8 shadow dark:bg-slate-800">
         @csrf

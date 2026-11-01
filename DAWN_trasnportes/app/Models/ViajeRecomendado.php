@@ -14,6 +14,7 @@ class ViajeRecomendado extends Model
         'ruta',
         'viaje_id',
         'imagen',
+        'imagen_portada',
         'precio',
         'descuento_porcentaje',
         'vehiculo',

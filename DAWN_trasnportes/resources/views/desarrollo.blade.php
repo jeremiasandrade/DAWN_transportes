@@ -1,108 +1,71 @@
 
 @extends('layouts.app')
 
-@section('title', 'Catálogo de rutas')
+@section('title', 'Panel de administración')
 
 @section('content')
-<div class="w-full max-w-7xl px-4 py-8">
-    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+<div class="mx-auto w-[calc(100%-2rem)] max-w-7xl py-8">
+    <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <p class="mb-2 text-sm font-semibold uppercase text-sky-700">Administración</p>
-            <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100">Catálogo de rutas</h1>
+            <p class="mb-1 text-xs font-bold uppercase text-sky-700">Dawn Transportes / Gestión</p>
+            <h1 class="text-3xl font-black text-slate-900 dark:text-slate-100">Panel de administración</h1>
         </div>
-        <p class="text-sm text-slate-600 dark:text-slate-300">Rutas registradas y módulos pendientes</p>
+        <a href="{{ route('home') }}" class="text-sm font-semibold text-sky-700 hover:underline dark:text-sky-300">Ver sitio público</a>
     </div>
 
-    <section class="mb-10" aria-labelledby="pages-heading">
-        <h2 id="pages-heading" class="mb-4 text-xl font-bold text-slate-800 dark:text-slate-100">Páginas generales</h2>
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach($pages as $page)
-                <div class="flex items-center justify-between gap-4 border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-                    <div>
-                        <h3 class="font-semibold text-slate-800 dark:text-slate-100">{{ $page['name'] }}</h3>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                            Vista: {{ $page['viewExists'] ? 'disponible' : 'pendiente' }}
-                        </p>
-                    </div>
-                    @if($page['routeExists'] && $page['viewExists'] && $page['route'] !== 'desarrollo')
-                        <a href="{{ route($page['route']) }}" class="shrink-0 font-semibold text-sky-700 hover:underline dark:text-sky-300">Abrir</a>
-                    @else
-                        <span class="shrink-0 text-sm text-slate-500">{{ $page['routeExists'] ? 'Actual' : 'Pendiente' }}</span>
-                    @endif
-                </div>
-            @endforeach
-        </div>
-    </section>
-
-    <section class="mb-10" aria-labelledby="registered-routes-heading">
-        <div class="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 id="registered-routes-heading" class="text-xl font-bold text-slate-800 dark:text-slate-100">Rutas registradas</h2>
-            <p class="text-sm text-slate-600 dark:text-slate-300">{{ $registeredRoutes->count() }} rutas detectadas en Laravel</p>
-        </div>
-        <div class="overflow-x-auto border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-            <table class="min-w-full text-left text-sm">
-                <thead class="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200">
+    <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
+        <table class="w-full min-w-195 text-left text-sm">
+            <thead class="bg-slate-100 text-xs font-bold uppercase text-slate-600 dark:bg-slate-700 dark:text-slate-200">
+                <tr>
+                    <th scope="col" class="px-5 py-3">Módulo</th>
+                    <th scope="col" class="px-5 py-3">Estado</th>
+                    <th scope="col" class="px-5 py-3 text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                @foreach($modules as $module)
                     <tr>
-                        <th class="px-4 py-3 font-semibold">Método</th>
-                        <th class="px-4 py-3 font-semibold">URI</th>
-                        <th class="px-4 py-3 font-semibold">Nombre</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
-                    @foreach($registeredRoutes as $route)
-                        <tr>
-                            <td class="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-300">{{ $route['methods'] }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-100">{{ $route['uri'] }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 text-slate-600 dark:text-slate-300">{{ $route['name'] }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </section>
+                        <th scope="row" class="px-5 py-4 font-semibold text-slate-800 dark:text-slate-100">{{ $module['name'] }}</th>
+                        <td class="px-5 py-4">
+                            <span class="inline-flex items-center gap-2 text-xs font-semibold {{ $module['indexAvailable'] ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300' }}">
+                                <span class="h-2 w-2 rounded-full {{ $module['indexAvailable'] ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                                {{ $module['indexAvailable'] ? 'Disponible' : 'En preparación' }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-3">
+                            <div class="flex justify-end gap-2">
+                                @if($module['createAvailable'])
+                                    <a href="{{ route($module['createRoute']) }}" class="inline-flex items-center gap-1.5 rounded border border-sky-200 px-3 py-2 text-xs font-bold text-sky-800 hover:bg-sky-50 dark:border-sky-800 dark:text-sky-200 dark:hover:bg-slate-700" aria-label="Crear en {{ $module['name'] }}" title="Crear">
+                                        <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                                        Crear
+                                    </a>
+                                @else
+                                    <span class="cursor-not-allowed rounded border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-400 dark:border-slate-700" aria-disabled="true">Crear</span>
+                                @endif
 
-    <section aria-labelledby="modules-heading">
-        <div class="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 id="modules-heading" class="text-xl font-bold text-slate-800 dark:text-slate-100">Módulos y acciones</h2>
-            <p class="text-sm text-slate-600 dark:text-slate-300">Las acciones con parámetros se abren desde el listado del módulo.</p>
-        </div>
+                                @if($module['indexAvailable'])
+                                    <a href="{{ route($module['indexRoute']) }}" class="inline-flex items-center gap-1.5 rounded border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700" aria-label="Listar {{ $module['name'] }}" title="Listar">
+                                        <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                                        Listar
+                                    </a>
+                                @else
+                                    <span class="cursor-not-allowed rounded border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-400 dark:border-slate-700" aria-disabled="true">Listar</span>
+                                @endif
 
-        <div class="grid gap-5 lg:grid-cols-2">
-            @foreach($modules as $module)
-                <article class="border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-                    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-700">
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">{{ $module['name'] }}</h3>
-                        @php($indexAction = $module['actions'][0])
-                        @if($indexAction['routeExists'] && $indexAction['viewExists'])
-                            <a href="{{ route($indexAction['routeName']) }}" class="font-semibold text-sky-700 hover:underline dark:text-sky-300">Abrir listado</a>
-                        @else
-                            <span class="text-sm font-semibold text-amber-700 dark:text-amber-300">Módulo pendiente</span>
-                        @endif
-                    </div>
-
-                    <div class="divide-y divide-slate-100 dark:divide-slate-700">
-                        @foreach($module['actions'] as $action)
-                            <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 text-sm">
-                                <div>
-                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $action['label'] }}</p>
-                                    <p class="mt-1 break-all font-mono text-xs text-slate-500 dark:text-slate-400">{{ $action['method'] }} {{ $action['uri'] }}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-semibold {{ $action['routeExists'] ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300' }}">
-                                        {{ $action['routeExists'] ? 'Ruta activa' : 'Sin ruta' }}
-                                    </p>
-                                    @if($action['viewName'])
-                                        <p class="mt-1 text-xs {{ $action['viewExists'] ? 'text-slate-500 dark:text-slate-400' : 'text-amber-700 dark:text-amber-300' }}">
-                                            {{ $action['viewExists'] ? 'Vista disponible' : 'Vista pendiente' }}
-                                        </p>
-                                    @endif
-                                </div>
+                                @if($module['deleteAvailable'])
+                                    <a href="{{ route($module['indexRoute']) }}" class="inline-flex items-center gap-1.5 rounded border border-rose-200 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 dark:border-rose-900 dark:text-rose-300 dark:hover:bg-slate-700" aria-label="Eliminar registros de {{ $module['name'] }} desde el listado" title="Eliminar desde el listado">
+                                        <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></svg>
+                                        Eliminar
+                                    </a>
+                                @else
+                                    <span class="cursor-not-allowed rounded border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-400 dark:border-slate-700" aria-disabled="true">Eliminar</span>
+                                @endif
                             </div>
-                        @endforeach
-                    </div>
-                </article>
-            @endforeach
-        </div>
-    </section>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

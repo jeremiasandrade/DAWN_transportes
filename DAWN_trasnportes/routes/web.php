@@ -51,69 +51,34 @@ Route::get('/register', [RegistrationController::class, 'create'])->name('regist
 Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
 Route::get('/desarrollo', function () {
     $modules = [
-        ['name' => 'Destinos', 'prefix' => 'destinos', 'view' => 'destino', 'uri' => 'destinos', 'parameter' => 'destino'],
-        ['name' => 'Rutas', 'prefix' => 'rutas', 'view' => 'ruta', 'uri' => 'rutas', 'parameter' => 'ruta'],
-        ['name' => 'Pasajes', 'prefix' => 'pasajes', 'view' => 'pasaje', 'uri' => 'pasajes', 'parameter' => 'pasaje'],
-        ['name' => 'Viajes', 'prefix' => 'viajes', 'view' => 'viaje', 'uri' => 'viajes', 'parameter' => 'viaje'],
-        ['name' => 'Vehículos', 'prefix' => 'vehiculos', 'view' => 'vehiculo', 'uri' => 'vehiculos', 'parameter' => 'vehiculo'],
-        ['name' => 'Usuarios', 'prefix' => 'usuarios', 'view' => 'usuario', 'uri' => 'usuarios', 'parameter' => 'usuario'],
-        ['name' => 'Reservas', 'prefix' => 'reservas', 'view' => 'reserva', 'uri' => 'reservas', 'parameter' => 'reserva'],
-        ['name' => 'Pagos', 'prefix' => 'pagos', 'view' => 'pago', 'uri' => 'pagos', 'parameter' => 'pago'],
-        ['name' => 'Clientes', 'prefix' => 'clientes', 'view' => 'cliente', 'uri' => 'clientes', 'parameter' => 'cliente'],
-        ['name' => 'Personas', 'prefix' => 'personas', 'view' => 'persona', 'uri' => 'personas', 'parameter' => 'persona'],
+        ['name' => 'Destinos', 'prefix' => 'destinos', 'view' => 'destino', 'ready' => true],
+        ['name' => 'Rutas', 'prefix' => 'rutas', 'view' => 'ruta', 'ready' => true],
+        ['name' => 'Pasajes', 'prefix' => 'pasajes', 'view' => 'pasaje', 'ready' => true],
+        ['name' => 'Viajes', 'prefix' => 'viajes', 'view' => 'viaje', 'ready' => false],
+        ['name' => 'Vehículos', 'prefix' => 'vehiculos', 'view' => 'vehiculo', 'ready' => false],
+        ['name' => 'Usuarios', 'prefix' => 'usuarios', 'view' => 'usuario', 'ready' => false],
+        ['name' => 'Reservas', 'prefix' => 'reservas', 'view' => 'reserva', 'ready' => false],
+        ['name' => 'Pagos', 'prefix' => 'pagos', 'view' => 'pago', 'ready' => false],
+        ['name' => 'Clientes', 'prefix' => 'clientes', 'view' => 'cliente', 'ready' => false],
+        ['name' => 'Personas', 'prefix' => 'personas', 'view' => 'persona', 'ready' => false],
+        ['name' => 'Viajes recomendados', 'prefix' => 'admin.viajes-recomendados', 'view' => 'admin.viajes-recomendados', 'ready' => true],
     ];
 
-    $actions = [
-        'index' => ['label' => 'Listado', 'method' => 'GET', 'uri' => ''],
-        'create' => ['label' => 'Formulario de creación', 'method' => 'GET', 'uri' => '/create'],
-        'store' => ['label' => 'Guardar nuevo registro', 'method' => 'POST', 'uri' => ''],
-        'show' => ['label' => 'Detalle', 'method' => 'GET', 'uri' => '/{parameter}'],
-        'edit' => ['label' => 'Formulario de edición', 'method' => 'GET', 'uri' => '/{parameter}/edit'],
-        'update' => ['label' => 'Actualizar registro', 'method' => 'PUT/PATCH', 'uri' => '/{parameter}'],
-        'destroy' => ['label' => 'Eliminar registro', 'method' => 'DELETE', 'uri' => '/{parameter}'],
-    ];
+    $modules = array_map(function (array $module): array {
+        $indexRoute = $module['prefix'].'.index';
+        $createRoute = $module['prefix'].'.create';
 
-    $modules = array_map(function (array $module) use ($actions): array {
-        $module['actions'] = array_map(function (string $action, array $details) use ($module): array {
-            $routeName = $module['prefix'].'.'.$action;
-            $viewName = in_array($action, ['index', 'create', 'show', 'edit'], true)
-                ? $module['view'].'.'.$action
-                : null;
-
-            return [
-                ...$details,
-                'uri' => '/'.$module['uri'].str_replace('{parameter}', '{'.$module['parameter'].'}', $details['uri']),
-                'routeName' => $routeName,
-                'routeExists' => Route::has($routeName),
-                'viewName' => $viewName,
-                'viewExists' => $viewName !== null && View::exists($viewName),
-            ];
-        }, array_keys($actions), array_values($actions));
-
-        return $module;
+        return [
+            ...$module,
+            'indexRoute' => $indexRoute,
+            'createRoute' => $createRoute,
+            'indexAvailable' => $module['ready'] && Route::has($indexRoute) && View::exists($module['view'].'.index'),
+            'createAvailable' => $module['ready'] && Route::has($createRoute) && View::exists($module['view'].'.create'),
+            'deleteAvailable' => $module['ready'] && Route::has($indexRoute) && Route::has($module['prefix'].'.destroy') && View::exists($module['view'].'.index'),
+        ];
     }, $modules);
 
-    $pages = [
-        ['name' => 'Inicio', 'route' => 'home', 'view' => 'home'],
-        ['name' => 'Iniciar sesión', 'route' => 'login', 'view' => 'login'],
-        ['name' => 'Registro', 'route' => 'register', 'view' => 'register'],
-        ['name' => 'Perfil', 'route' => 'profile', 'view' => 'usuario.perfil'],
-        ['name' => 'Desarrollo', 'route' => 'desarrollo', 'view' => 'desarrollo'],
-    ];
-
-    $pages = array_map(fn (array $page): array => [
-        ...$page,
-        'routeExists' => Route::has($page['route']),
-        'viewExists' => View::exists($page['view']),
-    ], $pages);
-
-    $registeredRoutes = collect(Route::getRoutes())->map(fn ($route): array => [
-        'methods' => implode('|', $route->methods()),
-        'uri' => '/'.$route->uri(),
-        'name' => $route->getName() ?? 'Sin nombre',
-    ])->sortBy('uri')->values();
-
-    return view('desarrollo', compact('modules', 'pages', 'registeredRoutes'));
+    return view('desarrollo', compact('modules'));
 })->middleware(['auth', 'can:access-development'])->name('desarrollo');
 
 use App\Http\Controllers\Admin\ViajeRecomendadoController;

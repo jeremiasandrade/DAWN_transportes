@@ -52,14 +52,24 @@
                     <label for="activo" class="text-sm text-slate-700">Activo</label>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="text-xs font-semibold text-slate-600">Imagen del viaje</label>
+                    <label for="imagen" class="text-xs font-semibold text-slate-600">Imagen para la tarjeta del inicio</label>
                     @if($viajeRecomendado->imagen)
                         <div class="mt-2 mb-2">
-                            <img src="{{ asset('storage/'.$viajeRecomendado->imagen) }}" alt="Imagen actual" class="h-24 rounded-lg object-cover">
+                            <img src="{{ asset('storage/'.$viajeRecomendado->imagen) }}" alt="Imagen actual de la tarjeta" class="h-24 rounded-lg object-cover">
                         </div>
                     @endif
                     <input name="imagen" type="file" accept="image/*" class="mt-1 w-full rounded-xl border border-sky-100 px-3 py-2.5 text-sm">
                     <p class="text-xs text-slate-500 mt-1">Dejar vacío para mantener la imagen actual</p>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="imagen_portada" class="text-xs font-semibold text-slate-600">Imagen de portada del detalle</label>
+                    @if($viajeRecomendado->imagen_portada)
+                        <div class="mt-2 mb-2">
+                            <img src="{{ asset('storage/'.$viajeRecomendado->imagen_portada) }}" alt="Portada actual del viaje" class="h-32 w-full max-w-md rounded-lg object-cover">
+                        </div>
+                    @endif
+                    <input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 w-full rounded-xl border border-sky-100 px-3 py-2.5 text-sm">
+                    <p class="text-xs text-slate-500 mt-1">Dejar vacío para mantener la portada actual</p>
                 </div>
             </div>
 

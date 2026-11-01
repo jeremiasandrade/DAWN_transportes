@@ -8,7 +8,11 @@
         </a>
 
         <article class="overflow-hidden rounded-[22px] border border-sky-200/60 bg-sky-100/80 shadow-sm">
-            <div class="h-44 bg-slate-200/70 sm:h-56" aria-hidden="true"></div>
+            <div class="h-44 bg-slate-200/70 sm:h-56">
+                @if($coverImage)
+                    <img src="{{ $coverImage }}" alt="Portada del viaje a {{ $trip['destination'] }}" class="h-full w-full object-cover">
+                @endif
+            </div>
 
             <div class="p-5 sm:p-7">
                 <div class="trip-detail-summary grid grid-cols-1 gap-5 sm:items-center">

@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
 test('each featured trip opens its detail page', function (string $id, string $destination, string $price) {
     $response = $this->get(route('viajes.show', $id));
 

@@ -17,7 +17,7 @@ test('an authenticated non-admin is forbidden from the development page', functi
         ->assertForbidden();
 });
 
-test('an administrator can see the development catalog', function () {
+test('an administrator can see the crud management dashboard', function () {
     $user = User::factory()->create(['dni' => 'admin-123']);
 
     Persona::create([
@@ -40,9 +40,22 @@ test('an administrator can see the development catalog', function () {
     $this->actingAs($user)
         ->get('/desarrollo')
         ->assertOk()
-        ->assertSee('Catálogo de rutas')
-        ->assertSee('Rutas registradas')
-        ->assertSee('profile.password.update')
+        ->assertSee('Panel de administración')
+        ->assertSee('aria-label="Crear en Destinos"', false)
+        ->assertSee('aria-label="Listar Destinos"', false)
+        ->assertSee('aria-label="Eliminar registros de Destinos desde el listado"', false)
+        ->assertSee('href="'.route('destinos.create').'"', false)
+        ->assertSee('href="'.route('destinos.index').'"', false)
         ->assertSee('Destinos')
-        ->assertSee('Clientes');
+        ->assertSee('Viajes recomendados')
+        ->assertSee('Panel Admin')
+        ->assertSee('En preparación');
+});
+
+test('an administrator is redirected to the management dashboard from home', function () {
+    $administrator = User::factory()->administrator()->create();
+
+    $this->actingAs($administrator)
+        ->get(route('home'))
+        ->assertRedirect(route('desarrollo'));
 });

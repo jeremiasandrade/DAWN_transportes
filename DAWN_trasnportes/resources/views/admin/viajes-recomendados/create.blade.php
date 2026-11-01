@@ -51,8 +51,12 @@
                     <label for="activo" class="text-sm text-slate-700">Activo</label>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="text-xs font-semibold text-slate-600">Imagen del viaje</label>
-                    <input name="imagen" type="file" accept="image/*" class="mt-1 w-full rounded-xl border border-sky-100 px-3 py-2.5 text-sm">
+                    <label for="imagen" class="text-xs font-semibold text-slate-600">Imagen para la tarjeta del inicio</label>
+                    <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 w-full rounded-xl border border-sky-100 px-3 py-2.5 text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="imagen_portada" class="text-xs font-semibold text-slate-600">Imagen de portada del detalle</label>
+                    <input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 w-full rounded-xl border border-sky-100 px-3 py-2.5 text-sm">
                 </div>
             </div>
 

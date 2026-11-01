@@ -16,6 +16,10 @@ class HomeController extends Controller
 {
     public function index(Request $request, DistanciaService $distanciaService, PrecioService $precioService): View|RedirectResponse
     {
+        if ($request->user()?->can('access-development')) {
+            return redirect()->route('desarrollo');
+        }
+
         $ciudades = Ciudad::with('provincia')
             ->orderBy('nombre_ciudad')
             ->get();
