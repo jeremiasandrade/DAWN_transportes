@@ -2,6 +2,7 @@
 
 use App\Models\Ciudad;
 use App\Models\Provincia;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
@@ -42,12 +43,13 @@ test('el resumen del viaje muestra precio duracion y opciones de pago', function
 
     simularDistanciaOsrm(700000);
 
-    $this->get(route('home', [
-        'origin' => $origen->id_ciudad,
-        'destination' => $destino->id_ciudad,
-        'date' => $fecha->toDateString(),
-        'vehicle' => 'doble-piso',
-    ]))->assertOk()
+    $this->actingAs(User::factory()->create())
+        ->get(route('home', [
+            'origin' => $origen->id_ciudad,
+            'destination' => $destino->id_ciudad,
+            'date' => $fecha->toDateString(),
+            'vehicle' => 'doble-piso',
+        ]))->assertOk()
         ->assertSee('Precio estimado')
         ->assertSee('$ 106.600')
         ->assertSee('9 h 40 min')
@@ -58,6 +60,23 @@ test('el resumen del viaje muestra precio duracion y opciones de pago', function
         ->assertSee('Transferencia bancaria');
 
     Http::assertSentCount(1);
+});
+
+test('un invitado que busca un viaje completo es enviado al login', function () {
+    $origen = crearCiudadParaResumen('Posadas', 'Misiones', -27.482, -55.896);
+    $destino = crearCiudadParaResumen('Buenos Aires', 'Ciudad Autónoma de Buenos Aires', -34.603, -58.381);
+    $fecha = now()->addDay();
+
+    simularDistanciaOsrm(700000);
+
+    $this->get(route('home', [
+        'origin' => $origen->id_ciudad,
+        'destination' => $destino->id_ciudad,
+        'date' => $fecha->toDateString(),
+        'vehicle' => 'doble-piso',
+    ]))->assertRedirect(route('login'));
+
+    expect(session('url.intended'))->toContain('origin='.$origen->id_ciudad);
 });
 
 test('sin fecha ni vehiculo se solicita completar los datos del resumen', function () {

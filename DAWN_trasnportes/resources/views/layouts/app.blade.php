@@ -63,3 +63,16 @@
     </script>
 </body>
 </html>
+@auth
+    @php
+        $isAdminLayout = \Illuminate\Support\Facades\DB::table('administradores')->where('persona_dni', auth()->user()->dni)->exists();
+    @endphp
+    @if($isAdminLayout)
+        <div class="bg-amber-50 border-b border-amber-200">
+            <div class="mx-auto w-[calc(100%-2rem)] md:w-[85%] md:max-w-6xl py-2 flex items-center gap-4 text-sm">
+                <span class="font-semibold text-amber-800">Panel Admin</span>
+                <a href="{{ route('admin.viajes-recomendados.index') }}" class="text-amber-700 hover:underline">Viajes recomendados</a>
+            </div>
+        </div>
+    @endif
+@endauth

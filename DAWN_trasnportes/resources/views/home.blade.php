@@ -2,17 +2,6 @@
 
 @section('content')
     @php
-        $offers = [
-            ['id' => 1, 'route' => 'Leandro N. Alem - Posadas', 'discount' => '15% OFF', 'price' => '$8.500', 'vehicle' => 'Minibús'],
-            ['id' => 2, 'route' => 'Leandro N. Alem - Córdoba', 'discount' => '20% OFF', 'price' => '$45.000', 'vehicle' => 'Ómnibus de doble piso'],
-            ['id' => 3, 'route' => 'Leandro N. Alem - Buenos Aires', 'discount' => '10% OFF', 'price' => '$55.000', 'vehicle' => 'Piso elevado'],
-            ['id' => 4, 'route' => 'Leandro N. Alem - Corrientes', 'discount' => '12% OFF', 'price' => '$12.000', 'vehicle' => 'Minibús'],
-            ['id' => 5, 'route' => 'Leandro N. Alem - Resistencia', 'discount' => '10% OFF', 'price' => '$18.500', 'vehicle' => 'Ómnibus de doble piso'],
-            ['id' => 6, 'route' => 'Leandro N. Alem - Formosa', 'discount' => '8% OFF', 'price' => '$22.000', 'vehicle' => 'Piso elevado'],
-            ['id' => 7, 'route' => 'Leandro N. Alem - Tucumán', 'discount' => '15% OFF', 'price' => '$39.000', 'vehicle' => 'Ómnibus de doble piso'],
-            ['id' => 8, 'route' => 'Leandro N. Alem - Salta', 'discount' => '10% OFF', 'price' => '$46.000', 'vehicle' => 'Piso elevado'],
-            ['id' => 9, 'route' => 'Leandro N. Alem - Mendoza', 'discount' => '18% OFF', 'price' => '$58.000', 'vehicle' => 'Ómnibus de doble piso'],
-        ];
         $offerPages = array_chunk($offers, 3);
     @endphp
 
@@ -176,10 +165,12 @@
             @endif
         </section>
 
-        <section>
-            <div class="mb-5 flex items-center gap-3">
-                <svg aria-hidden="true" class="h-6 w-6 shrink-0 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.59 11l9.58 9.59a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.59Z"/><circle cx="7" cy="7" r="1"/></svg>
-                <h1 class="text-xl font-bold text-slate-800 md:text-2xl">Ofertas y Destinos Destacados</h1>
+        <section class="flex flex-col gap-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-800 md:text-2xl">Viajes destacados</h1>
+                    <p class="text-sm text-slate-600">Ofertas recomendadas para tu próximo viaje</p>
+                </div>
             </div>
 
             <div data-trip-carousel aria-roledescription="carrusel" aria-label="Viajes destacados">
@@ -188,7 +179,11 @@
                         <div data-carousel-page="{{ $pageIndex }}" class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                             @foreach ($pageOffers as $offer)
                     <article class="flex min-w-0 flex-col overflow-hidden rounded-[20px] border border-sky-200/50 bg-sky-100/80 shadow-sm">
-                        <div class="h-44 shrink-0 bg-slate-200/70" aria-hidden="true"></div>
+                        <div class="h-44 shrink-0 bg-slate-200/70" aria-hidden="true">
+                            @if(!empty($offer['image']))
+                                <img src="{{ $offer['image'] }}" alt="{{ $offer['route'] }}" class="h-full w-full object-cover">
+                            @endif
+                        </div>
                         <div class="flex flex-1 flex-col p-4">
                             <h2 class="mb-3 text-base font-extrabold text-slate-800">{{ $offer['route'] }}</h2>
                             <div class="mb-3 flex items-center justify-between gap-2 rounded-2xl bg-white/70 p-2.5">
@@ -230,11 +225,7 @@
     <script>
         (() => {
             const carousel = document.querySelector('[data-trip-carousel]');
-
-            if (!carousel) {
-                return;
-            }
-
+            if (!carousel) { return; }
             const pages = Array.from(carousel.querySelectorAll('[data-carousel-page]'));
             const indicators = Array.from(carousel.querySelectorAll('[data-carousel-indicator]'));
             let activePage = 0;
@@ -242,11 +233,7 @@
 
             const showPage = (pageIndex) => {
                 activePage = (pageIndex + pages.length) % pages.length;
-
-                pages.forEach((page, index) => {
-                    page.classList.toggle('hidden', index !== activePage);
-                });
-
+                pages.forEach((page, index) => { page.classList.toggle('hidden', index !== activePage); });
                 indicators.forEach((indicator, index) => {
                     const isActive = index === activePage;
                     indicator.setAttribute('aria-current', String(isActive));
@@ -260,24 +247,14 @@
                 rotationTimer = window.setInterval(() => showPage(activePage + 1), 6000);
             };
 
-            carousel.querySelector('[data-carousel-previous]').addEventListener('click', () => {
-                showPage(activePage - 1);
-                startRotation();
+            carousel.querySelector('[data-carousel-previous]')?.addEventListener('click', () => { showPage(activePage - 1); startRotation(); });
+            carousel.querySelector('[data-carousel-next]')?.addEventListener('click', () => { showPage(activePage + 1); startRotation(); });
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => { showPage(index); startRotation(); });
             });
 
-            carousel.querySelector('[data-carousel-next]').addEventListener('click', () => {
-                showPage(activePage + 1);
-                startRotation();
-            });
-
-            indicators.forEach((indicator) => {
-                indicator.addEventListener('click', () => {
-                    showPage(Number(indicator.dataset.carouselIndicator));
-                    startRotation();
-                });
-            });
-
-            showPage(0);
+            pages.forEach((page) => page.classList.add('hidden'));
+            if (pages[0]) { pages[0].classList.remove('hidden'); }
             startRotation();
         })();
     </script>

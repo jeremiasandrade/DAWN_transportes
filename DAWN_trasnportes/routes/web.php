@@ -115,3 +115,9 @@ Route::get('/desarrollo', function () {
 
     return view('desarrollo', compact('modules', 'pages', 'registeredRoutes'));
 })->middleware(['auth', 'can:access-development'])->name('desarrollo');
+
+use App\Http\Controllers\Admin\ViajeRecomendadoController;
+
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('viajes-recomendados', ViajeRecomendadoController::class)->except(['show']);
+});
