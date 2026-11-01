@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Persona;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -47,16 +46,6 @@ test('an administrator can view and update another user through the profile view
         'dni' => '44332211',
         'gender' => 'masculino',
     ]);
-    Persona::query()->create([
-        'dni' => $user->dni,
-        'nombre' => 'Lucía',
-        'apellidos' => 'Gómez',
-        'correo_electronico' => $user->email,
-        'contrasenia' => $user->password,
-        'num_telefono' => $user->contact,
-        'sexo' => 'Masculino',
-    ]);
-
     $this->actingAs($administrator)
         ->get(route('usuarios.show', $user))
         ->assertOk()
@@ -114,7 +103,7 @@ test('an administrator cannot change a user document number from the CRUD', func
 
 test('an administrator can delete an unlinked user but cannot delete a user with legacy identity data', function () {
     $administrator = User::factory()->administrator()->create();
-    $unlinkedUser = User::factory()->create();
+    $unlinkedUser = User::factory()->create(['dni' => null]);
     $linkedUser = User::factory()->client()->create();
 
     $this->actingAs($administrator)

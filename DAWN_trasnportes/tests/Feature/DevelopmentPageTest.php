@@ -1,9 +1,7 @@
 <?php
 
-use App\Models\Persona;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -18,24 +16,7 @@ test('an authenticated non-admin is forbidden from the development page', functi
 });
 
 test('an administrator can see the crud management dashboard', function () {
-    $user = User::factory()->create(['dni' => 'admin-123']);
-
-    Persona::create([
-        'dni' => 'admin-123',
-        'nombre' => 'Admin',
-        'apellidos' => 'Proyecto',
-        'correo_electronico' => 'admin@example.com',
-        'contrasenia' => 'hashed-password',
-        'num_telefono' => '555123456',
-        'sexo' => 'Masculino',
-    ]);
-
-    $roleId = DB::table('roles')->insertGetId(['nombre_rol' => 'Administrador'], 'id_rol');
-
-    DB::table('administradores')->insert([
-        'persona_dni' => 'admin-123',
-        'rol_id' => $roleId,
-    ]);
+    $user = User::factory()->administrator()->create(['dni' => 'admin-123']);
 
     $this->actingAs($user)
         ->get('/desarrollo')

@@ -11,7 +11,6 @@ test('a user can sign in with their email and is redirected to home', function (
         'name' => 'Ana Pérez',
         'first_name' => 'Ana',
         'last_name' => 'Pérez',
-        'dni' => '12345678',
         'gender' => 'femenino',
         'contact' => '555123456',
         'email' => 'ana@example.com',

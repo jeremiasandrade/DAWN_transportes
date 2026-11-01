@@ -30,6 +30,14 @@ test('a visitor can register and is authenticated', function () {
         'contact' => '555123456',
         'email' => 'ana@example.com',
     ]);
+    $this->assertDatabaseHas('personas', [
+        'dni' => '12345678',
+        'nombre' => 'Ana',
+        'apellidos' => 'Pérez',
+        'correo_electronico' => 'ana@example.com',
+        'sexo' => 'Femenino',
+    ]);
+    $this->assertDatabaseHas('clientes', ['persona_dni' => '12345678']);
     expect($user->password)->not->toBe('password123');
 });
 

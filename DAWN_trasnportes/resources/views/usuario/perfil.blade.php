@@ -173,7 +173,7 @@
 				@foreach ([['first_name', 'Nombre', 'text'], ['last_name', 'Apellido', 'text'], ['dni', 'Documento de identidad', 'text'], ['contact', 'Teléfono', 'tel'], ['email', 'Email', 'email']] as [$field, $label, $type])
 					<label class="flex min-w-0 flex-col gap-1.5 text-xs font-bold text-slate-600">
 						{{ $label }}
-						<input name="{{ $field }}" type="{{ $type }}" value="{{ old($field, $user->{$field}) }}" required @readonly($adminMode && filled($user->dni) && $field === 'dni') class="w-full rounded-lg border border-sky-100 bg-sky-50/70 px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100">
+						<input name="{{ $field }}" type="{{ $type }}" value="{{ old($field, $user->{$field}) }}" required @readonly(filled($user->dni) && $field === 'dni') class="w-full rounded-lg border border-sky-100 bg-sky-50/70 px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100">
 						@error($field)<span class="text-xs font-medium text-red-600">{{ $message }}</span>@enderror
 					</label>
 				@endforeach

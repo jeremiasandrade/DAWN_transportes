@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use App\Models\User;
+use App\Services\UserAccountService;
+use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,25 +31,35 @@ class UserController extends Controller
         return view('register', ['adminUserForm' => true]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, UserAccountService $accountService): RedirectResponse
     {
         $this->authorizeAdmin();
 
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:45'],
+            'last_name' => ['required', 'string', 'max:45'],
             'dni' => ['required', 'string', 'max:32', 'unique:users,dni'],
             'gender' => ['required', Rule::in(['femenino', 'masculino', 'prefiero-no-decirlo'])],
             'contact' => ['required', 'string', 'max:32'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users,email',
+                function (string $attribute, mixed $value, Closure $fail) use ($request, $accountService): void {
+                    if ($accountService->personaEmailBelongsToAnotherDni(
+                        (string) $value,
+                        (string) $request->input('dni'),
+                    )) {
+                        $fail('El correo ya está asociado a otra persona.');
+                    }
+                },
+            ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        User::query()->create([
-            ...$validated,
-            'name' => $validated['first_name'].' '.$validated['last_name'],
-            'is_admin' => false,
-        ]);
+        $accountService->createCustomer($validated);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
     }
@@ -74,7 +86,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(Request $request, User $usuario): RedirectResponse
+    public function update(Request $request, User $usuario, UserAccountService $accountService): RedirectResponse
     {
         $this->authorizeAdmin();
 
@@ -91,36 +103,15 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:45'],
+            'last_name' => ['required', 'string', 'max:45'],
             'dni' => $dniRules,
             'gender' => ['required', Rule::in(['femenino', 'masculino', 'prefiero-no-decirlo'])],
             'contact' => ['required', 'string', 'max:32'],
             'email' => $emailRules,
         ]);
 
-        DB::transaction(function () use ($validated, $usuario, $persona): void {
-            $usuario->update([
-                ...$validated,
-                'name' => $validated['first_name'].' '.$validated['last_name'],
-            ]);
-
-            $personaSexo = match ($validated['gender']) {
-                'femenino' => 'Femenino',
-                'masculino' => 'Masculino',
-                default => null,
-            };
-
-            if ($persona !== null) {
-                $persona->update([
-                    'nombre' => mb_substr($validated['first_name'], 0, 45),
-                    'apellidos' => mb_substr($validated['last_name'], 0, 45),
-                    'correo_electronico' => $validated['email'],
-                    'num_telefono' => mb_substr($validated['contact'], 0, 45),
-                    ...($personaSexo ? ['sexo' => $personaSexo] : []),
-                ]);
-            }
-        });
+        $accountService->updateIdentity($usuario, $validated);
 
         return redirect()->route('usuarios.show', $usuario)->with('success', 'Usuario actualizado correctamente.');
     }

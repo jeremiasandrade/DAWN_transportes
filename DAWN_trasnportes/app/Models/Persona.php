@@ -38,6 +38,11 @@ class Persona extends Model
         return $this->hasOne(Cliente::class, 'persona_dni', 'dni');
     }
 
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'dni', 'dni');
+    }
+
     public function pasajes(): HasMany
     {
         return $this->hasMany(Pasaje::class, 'persona_dni', 'dni');
@@ -46,5 +51,14 @@ class Persona extends Model
     public function getNombreCompletoAttribute(): string
     {
         return trim($this->nombre.' '.$this->apellidos);
+    }
+
+    public static function sexoDesdeGenero(string $gender): string
+    {
+        return match (mb_strtolower($gender)) {
+            'femenino' => 'Femenino',
+            'masculino' => 'Masculino',
+            default => 'No especifica',
+        };
     }
 }
