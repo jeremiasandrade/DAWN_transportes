@@ -46,6 +46,8 @@ test('an administrator can see the crud management dashboard', function () {
         ->assertSee('aria-label="Eliminar registros de Destinos desde el listado"', false)
         ->assertSee('href="'.route('destinos.create').'"', false)
         ->assertSee('href="'.route('destinos.index').'"', false)
+        ->assertSee('aria-label="Crear en Usuarios"', false)
+        ->assertSee('href="'.route('usuarios.create').'"', false)
         ->assertSee('Destinos')
         ->assertSee('Viajes recomendados')
         ->assertSee('Panel Admin')

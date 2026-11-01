@@ -1,12 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+    @php($adminUserForm = $adminUserForm ?? false)
     <section class="mx-4 w-full max-w-132 rounded-[20px] border border-sky-200/50 bg-sky-100/80 p-8 shadow-md">
         <h1 class="mb-6 text-center text-2xl font-bold text-slate-800">
-            Registro
+            {{ $adminUserForm ? 'Crear usuario' : 'Registro' }}
         </h1>
 
-        <form method="POST" action="{{ route('register.store') }}" class="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
+        <form method="POST" action="{{ $adminUserForm ? route('usuarios.store') : route('register.store') }}" class="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
             @csrf
 
             @if ($errors->any())
@@ -145,13 +146,15 @@
                 type="submit"
                 class="col-span-full mt-1 w-full rounded-xl bg-[#0284c7] py-3 text-center text-sm font-semibold text-white shadow-md transition-all hover:bg-[#0369a1] focus:outline-none focus:ring-4 focus:ring-sky-300 active:scale-[0.98]"
             >
-                Registrarse
+                {{ $adminUserForm ? 'Crear usuario' : 'Registrarse' }}
             </button>
 
-            <p class="col-span-full text-center text-xs text-slate-600">
-                ¿ya tiene una cuenta?
-                <a href="{{ route('login') }}" class="font-semibold text-sky-700 hover:underline">iniciar sesión</a>
-            </p>
+            @unless($adminUserForm)
+                <p class="col-span-full text-center text-xs text-slate-600">
+                    ¿ya tiene una cuenta?
+                    <a href="{{ route('login') }}" class="font-semibold text-sky-700 hover:underline">iniciar sesión</a>
+                </p>
+            @endunless
         </form>
     </section>
 @endsection

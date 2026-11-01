@@ -2,6 +2,8 @@
 
 @section('content')
 	@php
+		$adminMode = $adminMode ?? false;
+		$adminEditing = $adminEditing ?? false;
 		$firstName = $user->first_name ?: explode(' ', $user->name)[0];
 		$initials = mb_strtoupper(mb_substr($user->first_name ?: $user->name, 0, 1).mb_substr($user->last_name ?? '', 0, 1));
 		$genderLabels = [
@@ -17,14 +19,26 @@
 			['Teléfono', $user->contact],
 			['Email', $user->email],
 		];
+		if ($adminMode) {
+			$profileFields[] = ['Tipo de cuenta', $user->is_admin ? 'Administrador' : 'Cliente'];
+		}
 	@endphp
 
-	<div data-profile-page data-invalid-dialog="{{ $errors->any() ? ($errors->hasAny(['first_name', 'last_name', 'dni', 'gender', 'contact', 'email']) ? 'edit' : 'password') : '' }}" class="mx-auto w-[calc(100%-2rem)] max-w-6xl py-5 md:py-8">
+	<div data-profile-page data-invalid-dialog="{{ $adminEditing || ($errors->any() && $errors->hasAny(['first_name', 'last_name', 'dni', 'gender', 'contact', 'email'])) ? 'edit' : ($errors->any() ? 'password' : '') }}" class="mx-auto w-[calc(100%-2rem)] max-w-6xl py-5 md:py-8">
 		<div class="mb-6 flex items-end justify-between gap-4 md:mb-8">
 			<div>
-				<p class="mb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-sky-700">Área personal</p>
-				<h1 class="text-3xl font-black text-slate-900">Mi cuenta</h1>
+				<p class="mb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-sky-700">{{ $adminMode ? 'Administración / Usuarios' : 'Área personal' }}</p>
+				<h1 class="text-3xl font-black text-slate-900">{{ $adminMode ? $user->name : 'Mi cuenta' }}</h1>
 			</div>
+			@if($adminMode)
+				<div class="flex gap-3">
+					<a href="{{ route('usuarios.index') }}" class="text-sm font-semibold text-slate-600 hover:underline">Volver al listado</a>
+					@if(!$adminEditing)
+						<a href="{{ route('usuarios.edit', $user) }}" class="text-sm font-semibold text-sky-700 hover:underline">Editar usuario</a>
+					@endif
+				</div>
+			@endif
+			@if(!$adminMode)
 			<div class="hidden items-center gap-2 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-slate-600 shadow-sm sm:flex">
 				@if ($user->email_verified_at)
 					<svg aria-hidden="true" class="h-4 w-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
@@ -34,6 +48,7 @@
 					Email sin verificar
 				@endif
 			</div>
+			@endif
 		</div>
 
 		<div class="grid gap-5 lg:grid-cols-[224px_minmax(0,1fr)] xl:gap-6">
@@ -91,10 +106,12 @@
 							<h2 class="mt-1.5 text-2xl font-black text-slate-900">Mis datos</h2>
 							<p class="mt-1.5 text-xs leading-5 text-slate-500">Estos datos se usarán para agilizar tus próximas reservas.</p>
 						</div>
+						@if(!$adminMode || $adminEditing)
 						<button type="button" data-open-profile-editor class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-3.5 py-2 text-[11px] font-extrabold text-white shadow-sm transition-colors hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">
 							<svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 4 4 4L8 20H4v-4L16 4Z"/><path d="m14 6 4 4"/></svg>
 							Editar información
 						</button>
+						@endif
 					</div>
 
 					@if (session('status'))
@@ -107,11 +124,12 @@
 						@foreach ($profileFields as [$label, $value])
 							<div class="min-w-0 border-b border-slate-100 py-3.5">
 								<dt class="text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-slate-400">{{ $label }}</dt>
-								<dd class="mt-1 break-words text-xs font-bold text-slate-800">{{ filled($value) ? $value : 'No informado' }}</dd>
+								<dd class="mt-1 wrap-break-word text-xs font-bold text-slate-800">{{ filled($value) ? $value : 'No informado' }}</dd>
 							</div>
 						@endforeach
 					</dl>
 
+					@unless($adminMode)
 					<div class="mt-5 flex flex-col gap-3 rounded-xl bg-sky-50 p-4 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<p class="text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-slate-400">Contraseña</p>
@@ -119,10 +137,11 @@
 						</div>
 						<button type="button" data-open-password-editor class="self-start text-xs font-extrabold text-sky-800 underline decoration-sky-300 underline-offset-4 hover:text-sky-950">Cambiar contraseña</button>
 					</div>
+					@endunless
 				</div>
 
 				@foreach (['Mis viajes', 'Pasajeros favoritos', 'Mis dispositivos', 'Mi Pase Dawn', 'Centro de ayuda', 'Condiciones generales'] as $sectionTitle)
-					<div data-profile-content="{{ $sectionTitle }}" class="hidden min-h-[360px] flex-col items-center justify-center text-center">
+					<div data-profile-content="{{ $sectionTitle }}" class="hidden min-h-90 flex-col items-center justify-center text-center">
 						<div class="mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-sky-100 text-sky-700">
 							<svg aria-hidden="true" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
 						</div>
@@ -136,8 +155,9 @@
 		</div>
 	</div>
 
+	@if(!$adminMode || $adminEditing)
 	<div data-profile-dialog="edit" class="fixed inset-0 z-50 hidden place-items-center overflow-y-auto bg-slate-950/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="profile-edit-title">
-		<form method="POST" action="{{ route('profile.update') }}" class="my-auto max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl md:p-7">
+		<form method="POST" action="{{ $adminMode ? route('usuarios.update', $user) : route('profile.update') }}" class="my-auto max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl md:p-7">
 			@csrf
 			@method('PUT')
 			<div class="mb-5 flex items-start justify-between gap-4">
@@ -153,7 +173,7 @@
 				@foreach ([['first_name', 'Nombre', 'text'], ['last_name', 'Apellido', 'text'], ['dni', 'Documento de identidad', 'text'], ['contact', 'Teléfono', 'tel'], ['email', 'Email', 'email']] as [$field, $label, $type])
 					<label class="flex min-w-0 flex-col gap-1.5 text-xs font-bold text-slate-600">
 						{{ $label }}
-						<input name="{{ $field }}" type="{{ $type }}" value="{{ old($field, $user->{$field}) }}" required class="w-full rounded-lg border border-sky-100 bg-sky-50/70 px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100">
+						<input name="{{ $field }}" type="{{ $type }}" value="{{ old($field, $user->{$field}) }}" required @readonly($adminMode && filled($user->dni) && $field === 'dni') class="w-full rounded-lg border border-sky-100 bg-sky-50/70 px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100">
 						@error($field)<span class="text-xs font-medium text-red-600">{{ $message }}</span>@enderror
 					</label>
 				@endforeach
@@ -173,7 +193,9 @@
 			</div>
 		</form>
 	</div>
+	@endif
 
+	@unless($adminMode)
 	<div data-profile-dialog="password" class="fixed inset-0 z-50 hidden place-items-center overflow-y-auto bg-slate-950/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="password-edit-title">
 		<form method="POST" action="{{ route('profile.password.update') }}" class="my-auto w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl md:p-7">
 			@csrf
@@ -202,6 +224,7 @@
 			</div>
 		</form>
 	</div>
+	@endunless
 
 	<script>
 		(() => {
@@ -233,12 +256,12 @@
 
 			tabs.forEach((tab) => tab.addEventListener('click', () => selectSection(tab.dataset.profileTab)));
 			document.querySelectorAll('[data-back-to-profile]').forEach((button) => button.addEventListener('click', () => selectSection('Mis datos')));
-			document.querySelector('[data-open-profile-editor]').addEventListener('click', () => {
+			document.querySelector('[data-open-profile-editor]')?.addEventListener('click', () => {
 				const dialog = document.querySelector('[data-profile-dialog="edit"]');
 				dialog.classList.remove('hidden');
 				dialog.classList.add('grid');
 			});
-			document.querySelector('[data-open-password-editor]').addEventListener('click', () => {
+			document.querySelector('[data-open-password-editor]')?.addEventListener('click', () => {
 				const dialog = document.querySelector('[data-profile-dialog="password"]');
 				dialog.classList.remove('hidden');
 				dialog.classList.add('grid');

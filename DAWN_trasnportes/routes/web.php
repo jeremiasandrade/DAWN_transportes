@@ -16,7 +16,7 @@ use App\Models\Ciudad;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
-Route::resource('usuarios', UserController::class);
+Route::resource('usuarios', UserController::class)->middleware('auth');
 Route::resource('vehiculos', VehiculoController::class);
 Route::model('destino', Ciudad::class);
 Route::resource('destinos', DestinoController::class);
@@ -56,7 +56,7 @@ Route::get('/desarrollo', function () {
         ['name' => 'Pasajes', 'prefix' => 'pasajes', 'view' => 'pasaje', 'ready' => true],
         ['name' => 'Viajes', 'prefix' => 'viajes', 'view' => 'viaje', 'ready' => false],
         ['name' => 'Vehículos', 'prefix' => 'vehiculos', 'view' => 'vehiculo', 'ready' => false],
-        ['name' => 'Usuarios', 'prefix' => 'usuarios', 'view' => 'usuario', 'ready' => false],
+        ['name' => 'Usuarios', 'prefix' => 'usuarios', 'view' => 'usuario', 'createView' => 'register', 'ready' => true],
         ['name' => 'Reservas', 'prefix' => 'reservas', 'view' => 'reserva', 'ready' => false],
         ['name' => 'Pagos', 'prefix' => 'pagos', 'view' => 'pago', 'ready' => false],
         ['name' => 'Clientes', 'prefix' => 'clientes', 'view' => 'cliente', 'ready' => false],
@@ -67,13 +67,14 @@ Route::get('/desarrollo', function () {
     $modules = array_map(function (array $module): array {
         $indexRoute = $module['prefix'].'.index';
         $createRoute = $module['prefix'].'.create';
+        $createView = $module['createView'] ?? $module['view'].'.create';
 
         return [
             ...$module,
             'indexRoute' => $indexRoute,
             'createRoute' => $createRoute,
             'indexAvailable' => $module['ready'] && Route::has($indexRoute) && View::exists($module['view'].'.index'),
-            'createAvailable' => $module['ready'] && Route::has($createRoute) && View::exists($module['view'].'.create'),
+            'createAvailable' => $module['ready'] && Route::has($createRoute) && View::exists($createView),
             'deleteAvailable' => $module['ready'] && Route::has($indexRoute) && Route::has($module['prefix'].'.destroy') && View::exists($module['view'].'.index'),
         ];
     }, $modules);
