@@ -16,9 +16,14 @@ services:
       DB_DATABASE: ${DB_DATABASE:?Define DB_DATABASE en .env}
       DB_USERNAME: ${DB_USERNAME:?Define DB_USERNAME en .env}
       DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
-      MAIL_MAILER: smtp
-      MAIL_HOST: mailpit
-      MAIL_PORT: 1025
+      MAIL_MAILER: ${SMTP_RELAY_MAILER:-smtp}
+      MAIL_HOST: ${SMTP_RELAY_HOST:-mailpit}
+      MAIL_PORT: ${SMTP_RELAY_PORT:-1025}
+      MAIL_SCHEME: ${SMTP_RELAY_SCHEME:-}
+      MAIL_USERNAME: ${SMTP_RELAY_USERNAME:-}
+      MAIL_PASSWORD: ${SMTP_RELAY_PASSWORD:-}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-pasajes@dawn.test}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Dawn Transportes}
     ports:
       - "8000:80"
     depends_on:
