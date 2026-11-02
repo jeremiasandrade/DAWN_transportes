@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ViajeController as AdminViajeController;
 use App\Http\Controllers\DestinoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
@@ -23,7 +24,7 @@ Route::resource('destinos', DestinoController::class);
 Route::get('rutas/distancia', [RutaController::class, 'distancia'])->name('rutas.distancia');
 Route::resource('rutas', RutaController::class);
 Route::resource('pasajes', PasajeController::class);
-Route::resource('viajes', ViajeController::class);
+Route::get('/viajes/{id}', [ViajeController::class, 'show'])->name('viajes.show');
 Route::resource('reservas', ReservaController::class);
 Route::resource('pagos', PagoController::class)
     ->only(['index', 'create', 'store', 'show'])
@@ -54,7 +55,7 @@ Route::get('/desarrollo', function () {
         ['name' => 'Destinos', 'prefix' => 'destinos', 'view' => 'destino', 'ready' => true],
         ['name' => 'Rutas', 'prefix' => 'rutas', 'view' => 'ruta', 'ready' => true],
         ['name' => 'Pasajes', 'prefix' => 'pasajes', 'view' => 'pasaje', 'ready' => true],
-        ['name' => 'Viajes', 'prefix' => 'viajes', 'view' => 'viaje', 'ready' => false],
+        ['name' => 'Viajes', 'prefix' => 'admin.viajes', 'view' => 'admin.viajes', 'ready' => true],
         ['name' => 'Vehículos', 'prefix' => 'vehiculos', 'view' => 'vehiculo', 'ready' => false],
         ['name' => 'Usuarios', 'prefix' => 'usuarios', 'view' => 'usuario', 'createView' => 'register', 'ready' => true],
         ['name' => 'Reservas', 'prefix' => 'reservas', 'view' => 'reserva', 'ready' => false],
@@ -85,5 +86,6 @@ Route::get('/desarrollo', function () {
 use App\Http\Controllers\Admin\ViajeRecomendadoController;
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('viajes', AdminViajeController::class)->middleware('can:access-development');
     Route::resource('viajes-recomendados', ViajeRecomendadoController::class)->except(['show']);
 });

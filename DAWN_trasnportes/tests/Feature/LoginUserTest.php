@@ -34,24 +34,22 @@ test('the home page renders the trip search and offer cards', function () {
         ->assertSee('data-theme-toggle', false)
         ->assertSee('Cambiar a tema oscuro')
         ->assertSee('Buscar Viajes disponibles')
-        ->assertSee('Ofertas y Destinos Destacados')
+        ->assertSee('Ofertas recomendadas para tu próximo viaje')
         ->assertSee('Leandro N. Alem - Posadas')
         ->assertSee('Leandro N. Alem - Córdoba')
         ->assertSee('Leandro N. Alem - Buenos Aires');
 });
 
-test('the home page shows nine featured trips across three carousel pages', function () {
+test('the home page shows the three fallback trips on one carousel page', function () {
     $response = $this->get(route('home'));
 
     $response->assertOk()
         ->assertSee('data-carousel-page="0"', false)
-        ->assertSee('data-carousel-page="1"', false)
-        ->assertSee('data-carousel-page="2"', false)
         ->assertSee('data-carousel-indicator="0"', false)
-        ->assertSee('data-carousel-indicator="1"', false)
-        ->assertSee('data-carousel-indicator="2"', false)
         ->assertSee('6000', false)
-        ->assertSee('Leandro N. Alem - Mendoza');
+        ->assertSee('Leandro N. Alem - Buenos Aires')
+        ->assertDontSee('data-carousel-page="1"', false)
+        ->assertDontSee('data-carousel-indicator="1"', false);
 });
 
 test('a visitor is sent to registration from the profile button', function () {
