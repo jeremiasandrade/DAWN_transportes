@@ -104,6 +104,45 @@ test('an administrator can create a travel using an existing route, client, and 
         ->assertSee('Corrientes');
 });
 
+test('an administrator can search trips by city or province and choose the sorting order', function () {
+    $data = prepararViajeCrud();
+    $resistencia = crearCiudadViajeCrud('Resistencia', 'Chaco', 3);
+    $trips = [
+        [$data['origen'], $data['destino'], '2026-11-15 08:00:00'],
+        [$data['destino'], $resistencia, '2026-11-16 08:00:00'],
+        [$resistencia, $data['origen'], '2026-11-17 08:00:00'],
+    ];
+
+    foreach ($trips as [$origin, $destination, $departure]) {
+        Ruta::query()->firstOrCreate([
+            'id_ciudad_partida' => $origin->id_ciudad,
+            'id_ciudad_llegada' => $destination->id_ciudad,
+        ], ['distancia' => 300]);
+
+        Viaje::query()->create([
+            'id_ciudad_partida' => $origin->id_ciudad,
+            'id_ciudad_llegada' => $destination->id_ciudad,
+            'cliente_dni' => $data['cliente']->persona_dni,
+            'vehiculo_id' => $data['vehiculo']->id_vehiculo,
+            'fecha_partida' => $departure,
+            'fecha_llegada' => date('Y-m-d H:i:s', strtotime($departure.' +6 hours')),
+        ]);
+    }
+
+    $this->actingAs($data['admin'])
+        ->get(route('admin.viajes.index', ['q' => 'Resistencia', 'orden' => 'nombre_desc']))
+        ->assertOk()
+        ->assertSeeInOrder(['Resistencia → Posadas', 'Corrientes → Resistencia'])
+        ->assertDontSee('Posadas → Corrientes')
+        ->assertSee('name="q" type="search" value="Resistencia"', false)
+        ->assertSee('value="nombre_desc" selected', false);
+
+    $this->get(route('admin.viajes.index'))
+        ->assertOk()
+        ->assertSeeInOrder(['Resistencia → Posadas', 'Corrientes → Resistencia', 'Posadas → Corrientes'])
+        ->assertSee('value="provincia" selected', false);
+});
+
 test('a travel cannot be created for a city pair without a registered route', function () {
     $data = prepararViajeCrud();
     $otroDestino = crearCiudadViajeCrud('Resistencia', 'Chaco', 3);

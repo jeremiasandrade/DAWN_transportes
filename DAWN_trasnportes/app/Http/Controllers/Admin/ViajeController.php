@@ -11,6 +11,7 @@ use App\Models\Viaje;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -19,15 +20,50 @@ class ViajeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'orden' => ['nullable', 'string', Rule::in(['provincia', 'nombre_asc', 'nombre_desc'])],
+        ]);
+        $busqueda = trim($validated['q'] ?? '');
+        $orden = $validated['orden'] ?? 'provincia';
+
         $viajes = Viaje::query()
+            ->leftJoin('ciudades as ciudad_partida', 'ciudad_partida.id_ciudad', '=', 'viajes.id_ciudad_partida')
+            ->leftJoin('provincias as provincia_partida', 'provincia_partida.id_provincia', '=', 'ciudad_partida.provincia_id')
+            ->leftJoin('ciudades as ciudad_llegada', 'ciudad_llegada.id_ciudad', '=', 'viajes.id_ciudad_llegada')
+            ->leftJoin('provincias as provincia_llegada', 'provincia_llegada.id_provincia', '=', 'ciudad_llegada.provincia_id')
+            ->select('viajes.*')
+            ->when($busqueda !== '', function ($query) use ($busqueda): void {
+                $query->where(function ($query) use ($busqueda): void {
+                    $termino = '%'.$busqueda.'%';
+
+                    $query->where('ciudad_partida.nombre_ciudad', 'like', $termino)
+                        ->orWhere('ciudad_llegada.nombre_ciudad', 'like', $termino)
+                        ->orWhere('provincia_partida.nombre_provincia', 'like', $termino)
+                        ->orWhere('provincia_llegada.nombre_provincia', 'like', $termino);
+                });
+            })
             ->with(['ciudadPartida', 'ciudadLlegada', 'cliente.persona', 'vehiculo'])
             ->withCount('pasajes')
-            ->orderByDesc('fecha_partida')
-            ->paginate(20);
+            ->when($orden === 'provincia', function ($query): void {
+                $query->orderBy('provincia_partida.nombre_provincia')
+                    ->orderBy('ciudad_partida.nombre_ciudad')
+                    ->orderBy('ciudad_llegada.nombre_ciudad');
+            })
+            ->when($orden === 'nombre_asc', function ($query): void {
+                $query->orderBy('ciudad_partida.nombre_ciudad')
+                    ->orderBy('ciudad_llegada.nombre_ciudad');
+            })
+            ->when($orden === 'nombre_desc', function ($query): void {
+                $query->orderByDesc('ciudad_partida.nombre_ciudad')
+                    ->orderByDesc('ciudad_llegada.nombre_ciudad');
+            })
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('admin.viajes.index', compact('viajes'));
+        return view('admin.viajes.index', compact('viajes', 'busqueda', 'orden'));
     }
 
     /**

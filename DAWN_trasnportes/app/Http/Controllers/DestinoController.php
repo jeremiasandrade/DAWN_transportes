@@ -6,15 +6,48 @@ use App\Models\Ciudad;
 use App\Models\Provincia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class DestinoController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $ciudades = Ciudad::with('provincia')->orderBy('nombre_ciudad')->get();
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'orden' => ['nullable', 'string', Rule::in(['provincia', 'nombre_asc', 'nombre_desc'])],
+        ]);
+        $busqueda = trim($validated['q'] ?? '');
+        $orden = $validated['orden'] ?? 'provincia';
 
-        return view('destino.index', compact('ciudades'));
+        $ciudades = Ciudad::query()
+            ->join('provincias', 'provincias.id_provincia', '=', 'ciudades.provincia_id')
+            ->select('ciudades.*')
+            ->when($busqueda !== '', function ($query) use ($busqueda): void {
+                $termino = '%'.$busqueda.'%';
+
+                $query->where(function ($query) use ($termino): void {
+                    $query->where('ciudades.nombre_ciudad', 'like', $termino)
+                        ->orWhere('provincias.nombre_provincia', 'like', $termino);
+                });
+            })
+            ->with('provincia')
+            ->when($orden === 'provincia', function ($query): void {
+                $query->orderBy('provincias.nombre_provincia')
+                    ->orderBy('ciudades.nombre_ciudad');
+            })
+            ->when($orden === 'nombre_asc', function ($query): void {
+                $query->orderBy('ciudades.nombre_ciudad')
+                    ->orderBy('provincias.nombre_provincia');
+            })
+            ->when($orden === 'nombre_desc', function ($query): void {
+                $query->orderByDesc('ciudades.nombre_ciudad')
+                    ->orderBy('provincias.nombre_provincia');
+            })
+            ->paginate(30)
+            ->withQueryString();
+
+        return view('destino.index', compact('ciudades', 'busqueda', 'orden'));
     }
 
     public function create(): View

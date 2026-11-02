@@ -128,6 +128,37 @@ test('el crud de destinos administra ciudades y provincias', function () {
     expect(Ciudad::find($ciudad->id_ciudad))->toBeNull();
 });
 
+test('el listado de destinos permite buscar y ordenar ciudades por provincia o nombre', function () {
+    crudCrearCiudad('Posadas', 'Misiones');
+    crudCrearCiudad('Corrientes', 'Corrientes');
+    crudCrearCiudad('Resistencia', 'Chaco');
+
+    $this->get(route('destinos.index', ['q' => 'Resistencia']))
+        ->assertOk()
+        ->assertSee('>Resistencia</td>', false)
+        ->assertDontSee('>Posadas</td>', false);
+
+    $this->get(route('destinos.index', ['q' => 'Chaco']))
+        ->assertOk()
+        ->assertSee('Resistencia')
+        ->assertDontSee('>Posadas</td>', false)
+        ->assertSee('name="q" type="search" value="Chaco"', false);
+
+    $this->get(route('destinos.index', ['orden' => 'nombre_desc']))
+        ->assertOk()
+        ->assertSeeInOrder(['Resistencia', 'Posadas', 'Corrientes'])
+        ->assertSee('value="nombre_desc" selected', false);
+
+    $this->get(route('destinos.index', ['orden' => 'nombre_asc']))
+        ->assertOk()
+        ->assertSeeInOrder(['Corrientes', 'Posadas', 'Resistencia']);
+
+    $this->get(route('destinos.index'))
+        ->assertOk()
+        ->assertSeeInOrder(['Resistencia', 'Corrientes', 'Posadas'])
+        ->assertSee('value="provincia" selected', false);
+});
+
 test('el crud de rutas usa la clave compuesta de ciudades', function () {
     $origen = crudCrearCiudad('Posadas');
     $destino = crudCrearCiudad('Encarnación', 'Itapúa');
