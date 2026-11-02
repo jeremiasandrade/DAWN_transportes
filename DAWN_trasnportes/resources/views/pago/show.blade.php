@@ -75,7 +75,7 @@
             </div>
 
             <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <a href="{{ route('home') }}" class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-bold text-slate-600 transition-colors hover:bg-slate-50">Volver al inicio</a>
+                <a href="{{ route('home.public') }}" class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-bold text-slate-600 transition-colors hover:bg-slate-50">Volver al inicio</a>
                 <a href="{{ route('pagos.index') }}" class="rounded-xl bg-[#0284c7] px-5 py-3 text-center text-sm font-bold text-white shadow-md transition-colors hover:bg-[#0369a1]">Ver mis compras</a>
             </div>
         </div>

@@ -16,7 +16,7 @@ class HomeController extends Controller
 {
     public function index(Request $request, DistanciaService $distanciaService, PrecioService $precioService): View|RedirectResponse
     {
-        if ($request->user()?->can('access-development')) {
+        if ($request->user()?->can('access-development') && ! $request->routeIs('home.public')) {
             return redirect()->route('desarrollo');
         }
 

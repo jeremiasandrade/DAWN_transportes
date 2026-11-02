@@ -6,12 +6,43 @@ use App\Models\Pasaje;
 use App\Models\Persona;
 use App\Models\Provincia;
 use App\Models\Ruta;
+use App\Models\User;
 use App\Models\Vehiculo;
 use App\Models\Viaje;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->actingAs(User::factory()->administrator()->create());
+});
+
+test('only administrators can access destination route and ticket management', function () {
+    Auth::logout();
+
+    $this->get(route('destinos.index'))->assertRedirect(route('login'));
+    $this->post(route('destinos.store'))->assertRedirect(route('login'));
+    $this->get(route('rutas.index'))->assertRedirect(route('login'));
+    $this->get(route('rutas.distancia', [
+        'id_ciudad_partida' => 1,
+        'id_ciudad_llegada' => 2,
+    ]))->assertRedirect(route('login'));
+    $this->post(route('rutas.store'))->assertRedirect(route('login'));
+    $this->get(route('pasajes.index'))->assertRedirect(route('login'));
+    $this->post(route('pasajes.store'))->assertRedirect(route('login'));
+
+    $this->actingAs(User::factory()->client()->create());
+
+    $this->get(route('destinos.index'))->assertForbidden();
+    $this->get(route('rutas.index'))->assertForbidden();
+    $this->get(route('rutas.distancia', [
+        'id_ciudad_partida' => 1,
+        'id_ciudad_llegada' => 2,
+    ]))->assertForbidden();
+    $this->get(route('pasajes.index'))->assertForbidden();
+});
 
 function crudCrearCiudad(string $nombre, string $provincia = 'Misiones'): Ciudad
 {

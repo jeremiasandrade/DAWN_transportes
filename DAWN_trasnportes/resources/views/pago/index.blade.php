@@ -10,7 +10,7 @@
                 <h1 class="mt-1 text-3xl font-extrabold text-slate-800">Mis compras</h1>
                 <p class="mt-1 text-sm text-slate-500">Comprobantes de pasajes comprados desde tu cuenta.</p>
             </div>
-            <a href="{{ route('home') }}" class="rounded-xl bg-[#0284c7] px-4 py-2.5 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#0369a1]">Buscar viajes</a>
+            <a href="{{ route('home.public') }}" class="rounded-xl bg-[#0284c7] px-4 py-2.5 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#0369a1]">Buscar viajes</a>
         </div>
 
         @if($pagos->isEmpty())

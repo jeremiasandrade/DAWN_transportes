@@ -3,6 +3,7 @@
 use App\Models\Ciudad;
 use App\Models\Provincia;
 use App\Models\Ruta;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
@@ -26,6 +27,8 @@ function crearCiudadConCoordenadas(
 }
 
 test('la creacion de una ruta calcula la distancia real con OSRM', function () {
+    $this->actingAs(User::factory()->administrator()->create());
+
     $origen = crearCiudadConCoordenadas('Posadas', 'Misiones', -27.482, -55.896);
     $destino = crearCiudadConCoordenadas('Buenos Aires', 'Ciudad Autónoma de Buenos Aires', -34.603, -58.381);
 
@@ -50,6 +53,8 @@ test('la creacion de una ruta calcula la distancia real con OSRM', function () {
 });
 
 test('la consulta de distancia devuelve el valor calculado por OSRM', function () {
+    $this->actingAs(User::factory()->administrator()->create());
+
     $origen = crearCiudadConCoordenadas('Posadas', 'Misiones', -27.482, -55.896);
     $destino = crearCiudadConCoordenadas('Buenos Aires', 'Ciudad Autónoma de Buenos Aires', -34.603, -58.381);
 

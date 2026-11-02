@@ -20,10 +20,12 @@ use Illuminate\Support\Facades\View;
 Route::resource('usuarios', UserController::class)->middleware('auth');
 Route::resource('vehiculos', VehiculoController::class);
 Route::model('destino', Ciudad::class);
-Route::resource('destinos', DestinoController::class);
-Route::get('rutas/distancia', [RutaController::class, 'distancia'])->name('rutas.distancia');
-Route::resource('rutas', RutaController::class);
-Route::resource('pasajes', PasajeController::class);
+Route::middleware(['auth', 'can:access-development'])->group(function () {
+    Route::resource('destinos', DestinoController::class);
+    Route::get('rutas/distancia', [RutaController::class, 'distancia'])->name('rutas.distancia');
+    Route::resource('rutas', RutaController::class);
+    Route::resource('pasajes', PasajeController::class);
+});
 Route::get('/viajes/{id}', [ViajeController::class, 'show'])->name('viajes.show');
 Route::resource('reservas', ReservaController::class);
 Route::resource('pagos', PagoController::class)
@@ -31,6 +33,7 @@ Route::resource('pagos', PagoController::class)
     ->middleware('auth');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/sitio-publico', [HomeController::class, 'index'])->name('home.public');
 
 Route::middleware('auth')->group(function () {
     Route::get('/perfil', [ProfileController::class, 'show'])->name('profile');

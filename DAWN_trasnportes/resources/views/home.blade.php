@@ -7,7 +7,7 @@
 
     <div class="mx-auto flex w-[calc(100%-2rem)] flex-col gap-10 pb-8 md:w-[85%] md:max-w-6xl">
         <section class="rounded-[20px] border border-sky-200/50 bg-sky-100/80 p-5 shadow-sm md:p-6">
-            <form method="GET" action="{{ route('home') }}" class="flex flex-col gap-5">
+            <form method="GET" action="{{ route('home.public') }}" class="flex flex-col gap-5">
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <div class="flex min-w-0 flex-col gap-1.5">
                         <label for="origin" class="ml-1 text-xs font-semibold text-slate-600">Origen</label>

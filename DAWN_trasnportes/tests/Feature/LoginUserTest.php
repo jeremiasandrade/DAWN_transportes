@@ -30,7 +30,7 @@ test('the home page renders the trip search and offer cards', function () {
     $response = $this->get(route('home'));
 
     $response->assertOk()
-        ->assertSee('href="'.route('home').'"', false)
+        ->assertSee('href="'.route('home.public').'"', false)
         ->assertSee('data-theme-toggle', false)
         ->assertSee('Cambiar a tema oscuro')
         ->assertSee('Buscar Viajes disponibles')

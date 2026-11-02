@@ -10,7 +10,7 @@
             <p class="mb-1 text-xs font-bold uppercase text-sky-700">Dawn Transportes / Gestión</p>
             <h1 class="text-3xl font-black text-slate-900 dark:text-slate-100">Panel de administración</h1>
         </div>
-        <a href="{{ route('home') }}" class="text-sm font-semibold text-sky-700 hover:underline dark:text-sky-300">Ver sitio público</a>
+        <a href="{{ route('home.public') }}" class="text-sm font-semibold text-sky-700 hover:underline dark:text-sky-300">Ver sitio público</a>
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">

@@ -22,6 +22,7 @@ test('an administrator can see the crud management dashboard', function () {
         ->get('/desarrollo')
         ->assertOk()
         ->assertSee('Panel de administración')
+        ->assertSee('href="'.route('home.public').'"', false)
         ->assertSee('aria-label="Crear en Destinos"', false)
         ->assertSee('aria-label="Listar Destinos"', false)
         ->assertSee('aria-label="Eliminar registros de Destinos desde el listado"', false)
@@ -44,4 +45,13 @@ test('an administrator is redirected to the management dashboard from home', fun
     $this->actingAs($administrator)
         ->get(route('home'))
         ->assertRedirect(route('desarrollo'));
+});
+
+test('an administrator can open the public home from its dedicated route', function () {
+    $administrator = User::factory()->administrator()->create();
+
+    $this->actingAs($administrator)
+        ->get(route('home.public'))
+        ->assertOk()
+        ->assertViewIs('home');
 });

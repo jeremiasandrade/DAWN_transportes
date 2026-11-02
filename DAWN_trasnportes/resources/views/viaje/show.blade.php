@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mx-auto w-[calc(100%-2rem)] max-w-179.5 pb-8">
-        <a href="{{ route('home') }}" class="mb-5 inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-1.5 text-xs font-semibold text-sky-700 transition-colors hover:bg-sky-200">
+        <a href="{{ route('home.public') }}" class="mb-5 inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-1.5 text-xs font-semibold text-sky-700 transition-colors hover:bg-sky-200">
             <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
             Volver a destinos
         </a>
