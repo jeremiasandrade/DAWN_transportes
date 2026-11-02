@@ -72,6 +72,7 @@ class UserController extends Controller
             'user' => $usuario,
             'adminMode' => true,
             'adminEditing' => false,
+            'pagos' => $usuario->pagos()->latest()->orderByDesc('id')->paginate(10)->appends(['section' => 'trips']),
         ]);
     }
 
@@ -83,6 +84,7 @@ class UserController extends Controller
             'user' => $usuario,
             'adminMode' => true,
             'adminEditing' => true,
+            'pagos' => $usuario->pagos()->latest()->orderByDesc('id')->paginate(10)->appends(['section' => 'trips']),
         ]);
     }
 

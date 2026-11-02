@@ -15,7 +15,17 @@ class ProfileController extends Controller
 {
     public function show(Request $request): View
     {
-        return view('usuario.perfil', ['user' => $request->user()]);
+        $pagos = $request->user()
+            ->pagos()
+            ->latest()
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->appends(['section' => 'trips']);
+
+        return view('usuario.perfil', [
+            'user' => $request->user(),
+            'pagos' => $pagos,
+        ]);
     }
 
     public function update(Request $request, UserAccountService $accountService): RedirectResponse

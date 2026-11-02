@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Pago;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -71,6 +72,73 @@ test('an authenticated user is sent to the empty profile page', function () {
         ->assertSee('Mi cuenta')
         ->assertSee('Mis datos')
         ->assertSee('Cerrar sesión');
+});
+
+test('a user sees only their own purchased trips in the profile history', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $ownPurchase = Pago::query()->create([
+        'user_id' => $user->id,
+        'referencia' => 'DAWN-OWN-01',
+        'viaje_codigo' => '2',
+        'origen' => 'Posadas',
+        'destino' => 'Córdoba',
+        'monto' => 45000,
+        'metodo_pago' => 'tarjeta_credito',
+        'estado' => 'aprobado',
+        'nombre_pasajero' => 'Pasajero propio',
+        'dni_pasajero' => '12345678',
+    ]);
+    Pago::query()->create([
+        'user_id' => $otherUser->id,
+        'referencia' => 'DAWN-OTHER-01',
+        'viaje_codigo' => '4',
+        'origen' => 'Corrientes',
+        'destino' => 'Salta',
+        'monto' => 25000,
+        'metodo_pago' => 'transferencia',
+        'estado' => 'pendiente',
+        'nombre_pasajero' => 'Otro pasajero',
+        'dni_pasajero' => '87654321',
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('profile', ['section' => 'trips']))
+        ->assertOk()
+        ->assertSee('data-active-section="Mis viajes"', false)
+        ->assertSee('Posadas')
+        ->assertSee('Córdoba')
+        ->assertSee('DAWN-OWN-01')
+        ->assertSee('Pasajero propio')
+        ->assertSee(route('pagos.show', $ownPurchase), false)
+        ->assertDontSee('DAWN-OTHER-01')
+        ->assertDontSee('Otro pasajero');
+});
+
+test('the trip history keeps the trips tab selected on the next page', function () {
+    $user = User::factory()->create();
+
+    foreach (range(1, 11) as $purchaseNumber) {
+        Pago::query()->create([
+            'user_id' => $user->id,
+            'referencia' => sprintf('DAWN-HISTORY-%02d', $purchaseNumber),
+            'viaje_codigo' => (string) $purchaseNumber,
+            'origen' => 'Posadas',
+            'destino' => 'Corrientes',
+            'monto' => 12000,
+            'metodo_pago' => 'tarjeta_debito',
+            'estado' => 'aprobado',
+            'nombre_pasajero' => 'Pasajero de prueba',
+            'dni_pasajero' => '12345678',
+        ]);
+    }
+
+    $this->actingAs($user)
+        ->get(route('profile', ['section' => 'trips', 'page' => 2]))
+        ->assertOk()
+        ->assertSee('data-active-section="Mis viajes"', false)
+        ->assertSee('DAWN-HISTORY-01')
+        ->assertDontSee('DAWN-HISTORY-02');
 });
 
 test('a visitor cannot access the profile page', function () {

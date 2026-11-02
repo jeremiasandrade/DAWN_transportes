@@ -4,6 +4,7 @@
 	@php
 		$adminMode = $adminMode ?? false;
 		$adminEditing = $adminEditing ?? false;
+		$activeSection = request()->query('section') === 'trips' ? 'Mis viajes' : 'Mis datos';
 		$firstName = $user->first_name ?: explode(' ', $user->name)[0];
 		$initials = mb_strtoupper(mb_substr($user->first_name ?: $user->name, 0, 1).mb_substr($user->last_name ?? '', 0, 1));
 		$genderLabels = [
@@ -24,7 +25,7 @@
 		}
 	@endphp
 
-	<div data-profile-page data-invalid-dialog="{{ $adminEditing || ($errors->any() && $errors->hasAny(['first_name', 'last_name', 'dni', 'gender', 'contact', 'email'])) ? 'edit' : ($errors->any() ? 'password' : '') }}" class="mx-auto w-[calc(100%-2rem)] max-w-6xl py-5 md:py-8">
+	<div data-profile-page data-active-section="{{ $activeSection }}" data-invalid-dialog="{{ $adminEditing || ($errors->any() && $errors->hasAny(['first_name', 'last_name', 'dni', 'gender', 'contact', 'email'])) ? 'edit' : ($errors->any() ? 'password' : '') }}" class="mx-auto w-[calc(100%-2rem)] max-w-6xl py-5 md:py-8">
 		<div class="mb-6 flex items-end justify-between gap-4 md:mb-8">
 			<div>
 				<p class="mb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-sky-700">{{ $adminMode ? 'Administración / Usuarios' : 'Área personal' }}</p>
@@ -66,7 +67,10 @@
 				<nav data-profile-navigation aria-label="Secciones de la cuenta" class="p-2">
 					<div class="flex gap-1.5 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible">
 						@foreach ([['Mis datos', 'edit'], ['Mis viajes', 'bus'], ['Pasajeros favoritos', 'heart'], ['Mis dispositivos', 'laptop'], ['Mi Pase Dawn', 'card'], ['Centro de ayuda', 'help'], ['Condiciones generales', 'info']] as [$label, $icon])
-							<button type="button" data-profile-tab="{{ $label }}" aria-current="{{ $loop->first ? 'page' : 'false' }}" class="inline-flex min-w-max items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[11px] font-bold transition-colors lg:flex lg:w-full {{ $loop->first ? 'bg-white text-sky-800 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-900' }}">
+							@php
+								$isActive = $activeSection === $label;
+							@endphp
+							<button type="button" data-profile-tab="{{ $label }}" aria-current="{{ $isActive ? 'page' : 'false' }}" class="inline-flex min-w-max items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[11px] font-bold transition-colors lg:flex lg:w-full {{ $isActive ? 'bg-white text-sky-800 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-900' }}">
 								@if ($icon === 'edit')
 									<svg aria-hidden="true" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 4 4 4L8 20H4v-4L16 4Z"/><path d="m14 6 4 4"/></svg>
 								@elseif ($icon === 'bus')
@@ -140,7 +144,76 @@
 					@endunless
 				</div>
 
-				@foreach (['Mis viajes', 'Pasajeros favoritos', 'Mis dispositivos', 'Mi Pase Dawn', 'Centro de ayuda', 'Condiciones generales'] as $sectionTitle)
+				<div data-profile-content="Mis viajes" class="hidden flex-col">
+					<div class="mb-5 border-b border-slate-100 pb-5">
+						<p class="text-[0.68rem] font-extrabold uppercase tracking-[0.16em] text-sky-700">Historial de compras</p>
+						<h2 class="mt-1.5 text-2xl font-black text-slate-900">Mis viajes</h2>
+						<p class="mt-1.5 text-xs leading-5 text-slate-500">Tus pasajes y reservas, ordenados desde la compra más reciente.</p>
+					</div>
+
+					@if($pagos->isEmpty())
+						<div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center">
+							<div class="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-sky-100 text-sky-700">
+								<svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 1 0 4 0m-4 0H3V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10h-2m-10 0h6m4 0a2 2 0 1 1-4 0m4 0h2M7 9h10"/></svg>
+							</div>
+							<h3 class="text-sm font-extrabold text-slate-800">Todavía no tienes viajes</h3>
+							<p class="mt-1 text-xs text-slate-500">Cuando compres un pasaje, aparecerá aquí.</p>
+							<a href="{{ route('home.public') }}" class="mt-4 inline-flex items-center gap-2 rounded-lg bg-sky-700 px-4 py-2.5 text-xs font-extrabold text-white transition-colors hover:bg-sky-800">
+								<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+								Buscar viajes
+							</a>
+						</div>
+					@else
+						<div class="space-y-3">
+							@foreach($pagos as $pago)
+								@php
+									$estadoClasses = match ($pago->estado) {
+										'aprobado' => 'bg-emerald-100 text-emerald-800',
+										'pendiente' => 'bg-amber-100 text-amber-800',
+										'rechazado' => 'bg-rose-100 text-rose-800',
+										default => 'bg-slate-100 text-slate-700',
+									};
+								@endphp
+								<article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+									<div class="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-4 py-3.5 sm:px-5">
+										<div class="min-w-0">
+											<p class="text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-slate-400">{{ $pago->created_at->format('d/m/Y · H:i') }}</p>
+											<h3 class="mt-1 text-base font-black text-slate-900">{{ $pago->origen }} <span class="text-sky-700">→</span> {{ $pago->destino }}</h3>
+										</div>
+										<span class="shrink-0 rounded-full px-3 py-1.5 text-[0.62rem] font-extrabold uppercase {{ $estadoClasses }}">{{ $pago->estado_etiqueta }}</span>
+									</div>
+									<div class="grid gap-4 px-4 py-4 sm:grid-cols-2 sm:px-5 lg:grid-cols-4">
+										<div>
+											<p class="text-[0.58rem] font-extrabold uppercase tracking-[0.12em] text-slate-400">Pasajero</p>
+											<p class="mt-1 text-xs font-bold text-slate-800">{{ $pago->nombre_pasajero }}</p>
+										</div>
+										<div>
+											<p class="text-[0.58rem] font-extrabold uppercase tracking-[0.12em] text-slate-400">Referencia</p>
+											<p class="mt-1 truncate font-mono text-xs font-bold text-slate-700">{{ $pago->referencia }}</p>
+										</div>
+										<div>
+											<p class="text-[0.58rem] font-extrabold uppercase tracking-[0.12em] text-slate-400">Medio de pago</p>
+											<p class="mt-1 text-xs font-bold text-slate-700">{{ $pago->metodo_pago_etiqueta }}</p>
+										</div>
+										<div>
+											<p class="text-[0.58rem] font-extrabold uppercase tracking-[0.12em] text-slate-400">Total</p>
+											<p class="mt-1 text-base font-black text-sky-700">$ {{ number_format($pago->monto, 0, ',', '.') }}</p>
+										</div>
+									</div>
+									<div class="flex justify-end border-t border-slate-100 px-4 py-3 sm:px-5">
+										<a href="{{ route('pagos.show', $pago) }}" class="inline-flex items-center gap-1.5 text-xs font-extrabold text-sky-800 hover:text-sky-950">
+											Ver comprobante
+											<svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+										</a>
+									</div>
+								</article>
+							@endforeach
+						</div>
+						<div class="mt-5">{{ $pagos->links() }}</div>
+					@endif
+				</div>
+
+				@foreach (['Pasajeros favoritos', 'Mis dispositivos', 'Mi Pase Dawn', 'Centro de ayuda', 'Condiciones generales'] as $sectionTitle)
 					<div data-profile-content="{{ $sectionTitle }}" class="hidden min-h-90 flex-col items-center justify-center text-center">
 						<div class="mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-sky-100 text-sky-700">
 							<svg aria-hidden="true" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
@@ -277,6 +350,8 @@
 					closeDialogs();
 				}
 			});
+
+			selectSection(document.querySelector('[data-profile-page]').dataset.activeSection);
 
 			const invalidDialog = document.querySelector('[data-profile-page]').dataset.invalidDialog;
 			if (invalidDialog) {

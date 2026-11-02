@@ -93,3 +93,7 @@ Aplica las nuevas migraciones a la base de datos persistente después de actuali
 
 Las dos instrucciones anteriores se ejecutan en ese orden. El volumen `mariadb_data`
 conserva los datos al reconstruir la aplicación o ejecutar `podman compose down`.
+
+
+para correr los test de pest se utiliza
+php artisan test --compact
